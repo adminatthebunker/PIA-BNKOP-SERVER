@@ -1,0 +1,48 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Obsidian (this dir lives inside an Obsidian vault — keep vault config out)
+.obsidian/
+.trash/
+
+# Python (server code likely)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node (if any tooling lands here)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# MkDocs build output
+site/
+
+# Docker / runtime
+.env
+.env.*
+!.env.example
+*.pid
+*.log
+
+# Secrets — never commit
+*.key
+*.pem
+*.crt
+secrets/
+credentials.json

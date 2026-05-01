@@ -1,0 +1,215 @@
+# =============================================================================
+# PIA Starter Stack
+# =============================================================================
+# Deployment assumption: this compose runs BEHIND a Pangolin / Newt tunnel.
+# Newt connects out to a Pangolin instance and forwards traffic to backend
+# services BY DOCKER SERVICE NAME on the shared `pia-stack` network. None of
+# the backend services bind host ports — Newt is the only path in.
+#
+# For local testing without Pangolin, run curl from inside the network, e.g.:
+#   docker run --rm --network pia-stack curlimages/curl:latest -sI http://listmonk:9000/
+#
+# Default profile starts: newt, mkdocs (dev), mkdocs-site-server (static),
+#                         listmonk-db, listmonk, code-server
+# `--profile session` adds: cryptpad
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Newt — Pangolin tunnel client
+  # Connects out to a Pangolin instance and forwards traffic to backend
+  # services on the `pia-stack` network by docker service name (e.g.
+  # `listmonk:9000`, `cryptpad:3000`). No host port binding — Pangolin
+  # resources target the docker service names directly.
+  #
+  # Required env (get NEWT_ID / NEWT_SECRET by registering this host as a
+  # "site" in your Pangolin admin UI, type "newt"):
+  #   PANGOLIN_ENDPOINT, PANGOLIN_NEWT_ID, PANGOLIN_NEWT_SECRET
+  #
+  # Forks that use a different tunnel (Cloudflared, Tailscale Funnel) can
+  # comment this service out — the rest of the stack is tunnel-agnostic.
+  # ---------------------------------------------------------------------------
+  newt:
+    image: fosrl/newt:latest
+    environment:
+      - PANGOLIN_ENDPOINT=${PANGOLIN_ENDPOINT}
+      - NEWT_ID=${PANGOLIN_NEWT_ID}
+      - NEWT_SECRET=${PANGOLIN_NEWT_SECRET}
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # MkDocs Material — DEV server (hot-reload)
+  # Replaces: Squarespace, Notion-public, a half-built WordPress site.
+  # Edit ./docs/*.md, save, refresh — the site rebuilds automatically.
+  # Use this during the live session: pasting research files into ./docs/
+  # shows up on the public URL within seconds with no extra build step.
+  #
+  # Reachable on the network as `mkdocs:8000`.
+  # ---------------------------------------------------------------------------
+  mkdocs:
+    image: squidfunk/mkdocs-material:latest
+    # Run as the same UID/GID as code-server (and as nginx-static-server's
+    # PUID/PGID). All three touch ./site/ — keeping them on a single UID
+    # means no permission tangles between `docker compose run --rm mkdocs
+    # build` (this service) and `mkdocs build` from code-server's terminal.
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+    working_dir: /docs
+    # Image ENTRYPOINT is `mkdocs`; pass the subcommand only.
+    command: ["serve", "--dev-addr=0.0.0.0:8000"]
+    expose:
+      - "8000"
+    volumes:
+      - ./mkdocs.yml:/docs/mkdocs.yml
+      - ./docs:/docs/docs
+      # Output directory for `mkdocs build` — shared with mkdocs-site-server
+      # which serves the built static files. Bind-mounting to the host means
+      # one container's build output is the other container's web root.
+      - ./site:/docs/site
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # MkDocs built site — Nginx static server (production serve)
+  # Serves the output of `mkdocs build` (./site/) as plain static files.
+  # Faster, leaner, and survives the Python process dying — but does NOT
+  # auto-rebuild on content changes. Run `docker compose run --rm mkdocs \
+  # mkdocs build` after editing.
+  #
+  # Pick one for public exposure: the dev `mkdocs` service above OR this one.
+  # Running both at the same upstream domain will fight over routing.
+  #
+  # Reachable on the network as `mkdocs-site-server:80`.
+  # ---------------------------------------------------------------------------
+  mkdocs-site-server:
+    image: lscr.io/linuxserver/nginx:1.28.2
+    environment:
+      - PUID=${USER_ID:-1000}
+      - PGID=${GROUP_ID:-1000}
+      - TZ=${TZ:-Etc/UTC}
+    expose:
+      - "80"
+    volumes:
+      - ./site:/config/www
+      - ./configs/mkdocs-site/default.conf:/config/nginx/site-confs/default.conf:ro
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # CryptPad — collaborative pad (OPTIONAL — session infrastructure only)
+  # Replaces: Google Docs / Etherpad-as-SaaS.
+  #
+  # Behind the `session` profile because most forks of this stack don't need
+  # CryptPad — it's the live-writing surface for the PIA workshop, not a
+  # service an advocacy org runs day-to-day. Bring it up with:
+  #     docker compose --profile session up -d
+  #
+  # Needs TWO Pangolin resources: a "main" origin (pad.*) and a "sandbox"
+  # origin (pad-sandbox.*). Both target `cryptpad:3000` — sandbox separation
+  # is enforced by Host header. The WebSocket path on the main domain
+  # (/cryptpad_websocket) needs a Pangolin path-rule targeting `cryptpad:3003`.
+  # ---------------------------------------------------------------------------
+  cryptpad:
+    profiles: ["session"]
+    image: cryptpad/cryptpad:version-2026.2.2
+    hostname: cryptpad
+    environment:
+      - CPAD_MAIN_DOMAIN=${CRYPTPAD_MAIN_DOMAIN:-http://localhost}
+      - CPAD_SANDBOX_DOMAIN=${CRYPTPAD_SANDBOX_DOMAIN:-http://localhost}
+      - CPAD_CONF=/cryptpad/config/config.js
+    expose:
+      - "3000"
+      - "3003"
+    volumes:
+      # Custom config.js — overrides the dev-flavored one shipped in the image
+      # (which hardcodes httpAddress: 'localhost', breaking inter-container
+      # reachability) and reads URLs from CPAD_MAIN_DOMAIN/CPAD_SANDBOX_DOMAIN.
+      - ./configs/cryptpad/config.js:/cryptpad/config/config.js:ro
+      - ./data/cryptpad/blob:/cryptpad/blob
+      - ./data/cryptpad/block:/cryptpad/block
+      - ./data/cryptpad/data:/cryptpad/data
+      - ./data/cryptpad/files:/cryptpad/datastore
+      - ./data/cryptpad/customize:/cryptpad/customize
+    ulimits:
+      nofile:
+        soft: 1000000
+        hard: 1000000
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Listmonk — mass email / newsletter management
+  # Replaces: Mailchimp, Constant Contact
+  # Reachable on the network as `listmonk:9000`.
+  # ---------------------------------------------------------------------------
+  listmonk-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${LISTMONK_DB_USER:-listmonk}
+      POSTGRES_PASSWORD: ${LISTMONK_DB_PASSWORD:-listmonk}
+      POSTGRES_DB: ${LISTMONK_DB_NAME:-listmonk}
+    volumes:
+      - listmonk-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  listmonk:
+    image: listmonk/listmonk:latest
+    expose:
+      - "9000"
+    depends_on:
+      - listmonk-db
+    environment:
+      LISTMONK_app__address: "0.0.0.0:9000"
+      LISTMONK_db__host: listmonk-db
+      LISTMONK_db__user: ${LISTMONK_DB_USER:-listmonk}
+      LISTMONK_db__password: ${LISTMONK_DB_PASSWORD:-listmonk}
+      LISTMONK_db__database: ${LISTMONK_DB_NAME:-listmonk}
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Code Server — web IDE (admin / build convenience)
+  # Lets you edit ./docs/*.md, edit mkdocs.yml, and run `mkdocs build` from a
+  # browser instead of SSH + terminal. Useful for the session climax: paste,
+  # save, click Terminal → `mkdocs build`, refresh pia2026.* on the projector.
+  #
+  # SECURITY: code-server provides shell access via a browser. Reachable on
+  # 127.0.0.1:8889 by default (use SSH tunnel for remote access). DO NOT
+  # publish via Pangolin without a strong password and ideally behind an
+  # IP allowlist or Pangolin auth resource.
+  #
+  # IMAGE: defaults to upstream `codercom/code-server:latest` (vanilla) so
+  # forks work out of the box. PIA's deployment can override to the BNKops
+  # prebuilt image (mkdocs + plugins + claude-code preinstalled):
+  #     CODE_SERVER_IMAGE=gitea.bnkops.com/admin/code-server:latest
+  # On vanilla image, install mkdocs in the workspace terminal once:
+  #     pip install --user "mkdocs-material[recommended]"
+  # ---------------------------------------------------------------------------
+  code-server:
+    image: ${CODE_SERVER_IMAGE:-codercom/code-server:latest}
+    environment:
+      - PUID=${USER_ID:-1000}
+      - PGID=${GROUP_ID:-1000}
+      - TZ=${TZ:-Etc/UTC}
+      - DEFAULT_WORKSPACE=/config/workspace
+      - PASSWORD=${CODE_SERVER_PASSWORD:-changeme}
+    ports:
+      - "127.0.0.1:${CODE_SERVER_PORT:-8889}:8443"
+    volumes:
+      # Code-server's own state (settings, extensions, terminal history).
+      - ./data/code-server:/config
+      # Workspace — what shows up in the IDE file tree.
+      - ./docs:/config/workspace/docs
+      - ./mkdocs.yml:/config/workspace/mkdocs.yml
+      - ./site:/config/workspace/site
+      - ./configs:/config/workspace/configs
+      - ./docker-compose.yml:/config/workspace/docker-compose.yml
+      # NOTE: ./.env intentionally NOT mounted — keep secrets out of the IDE.
+      # NOTE: ./data/ intentionally NOT mounted — runtime state, not editable.
+    restart: unless-stopped
+
+# Single named network — every service joins by default. Naming it explicitly
+# (rather than letting compose auto-create `<project>_default`) makes the
+# `docker run --rm --network pia-stack ...` test pattern stable across hosts.
+networks:
+  default:
+    name: pia-stack
+    driver: bridge
+
+volumes:
+  listmonk-db:

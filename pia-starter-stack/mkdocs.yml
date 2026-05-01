@@ -1,0 +1,82 @@
+site_name: Free & Open Source Campaigning — PIA 2026
+site_description: Live writing from the room — Public Interest Alberta workshop, May 2026.
+# site_url is the canonical / permanent URL — set to the static-site domain
+# (pia2026), NOT the dev-server domain (live). Sitemaps, OpenGraph cards, and
+# canonical-link headers all consume this value.
+site_url: https://pia2026.publicinterestalberta.org
+site_author: Public Interest Alberta + The Bunker Operations
+copyright: Co-written by the room at PIA 2026 · CC BY-SA 4.0
+
+theme:
+  name: material
+  features:
+    - navigation.instant       # client-side nav, no full page reloads
+    - navigation.tracking      # URL updates as you scroll through anchors
+    - navigation.top           # back-to-top button
+    - navigation.sections      # top-level nav items render as section headers
+    - content.code.copy        # copy-to-clipboard on code blocks
+    - search.suggest
+    - search.highlight
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+# Top-level nav. Group-research files (docs/research/group-N.md) are added
+# during the session — they get URLs at /research/group-N/ but don't appear
+# in the side menu. Reed adds a link from docs/research.md to each new group
+# page when he pulls it from CryptPad.
+#
+# (If you install mkdocs-awesome-pages-plugin you can drop a docs/research/
+# .pages file and the group pages will auto-appear under "Research" — see
+# https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin .)
+nav:
+  - Home: index.md
+  - Research: research.md
+  - Subscribe: subscribe.md
+
+# Suppress "exists in docs but not in nav" warnings for the group-N.md files
+# that get added during the session (they're reachable by URL, just not
+# listed in the side menu).
+not_in_nav: |
+  /research/*.md
+
+markdown_extensions:
+  - admonition              # !!! note / !!! warning callout boxes
+  - attr_list               # {.classes #ids} on any element
+  - md_in_html              # markdown inside <div> blocks (for grid layouts)
+  - tables
+  - footnotes
+  - toc:
+      permalink: true       # ¶ link next to each heading
+      toc_depth: 3
+  - pymdownx.details        # collapsible sections
+  - pymdownx.superfences    # code blocks with language hints + nesting
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra:
+  social:
+    - icon: fontawesome/solid/globe
+      link: https://publicinterestalberta.org/
+      name: Public Interest Alberta
+    - icon: fontawesome/solid/envelope
+      link: mailto:contact@publicinterestalberta.org
+      name: Email PIA
