@@ -12,16 +12,18 @@ One `docker-compose.yml`. A handful of services. Runs on any Linux machine with 
 | **MkDocs Material** (dev server, hot-reload) | Squarespace / a half-built WordPress | `mkdocs:8000` |
 | **Nginx** (serves the built `./site/` directory) | The above, in production | `mkdocs-site-server:80` |
 | **Listmonk** + Postgres | Mailchimp / Constant Contact | `listmonk:9000` |
+| **Apache Answer** | Stack Overflow Teams / Zendesk Guide | `answer:80` |
+| **Homepage** ([gethomepage.dev](https://gethomepage.dev)) | Hand-rolled `index.html`, "where do I log in to ___?" Slack threads | `homepage:3000` |
 | **Code Server** (web IDE — admin convenience) | SSH + vim | `127.0.0.1:8889` (host loopback — exception to no-host-ports rule) |
 | **CryptPad** *(optional, session profile)* | Google Docs / Etherpad-as-SaaS | `cryptpad:3000` (HTTP) + `cryptpad:3003` (WS) |
 
 **No host ports are bound.** The whole stack is reachable only from inside the `pia-stack` docker network. Newt is the one path in from the public internet (via Pangolin). For local testing without Pangolin, see "Quick start" below.
 
-The MkDocs site is your org's public knowledge base — homepage, research, "subscribe" page, anything else. Edit `docs/*.md`, save, refresh; the dev server rebuilds. For production, run `mkdocs build` and let the Nginx service serve the static output. Listmonk handles email: subscriber lists, campaigns, sending. CryptPad is session-only — it's the collaborative editor used during the live workshop, not something most forks of this stack need to run.
+The MkDocs site is your org's public knowledge base — landing page, research, "subscribe" page, anything else. Edit `docs/*.md`, save, refresh; the dev server rebuilds. For production, run `mkdocs build` and let the Nginx service serve the static output. Listmonk handles email: subscriber lists, campaigns, sending. Homepage is the service dashboard for staff and members — point `lander.yourorg.org` at it and every other tool in the stack is one click away; config lives in [`configs/homepage/`](./configs/homepage/). CryptPad is session-only — it's the collaborative editor used during the live workshop, not something most forks of this stack need to run.
 
 ## Deployment assumption: there's a tunnel in front
 
-This stack assumes a [Pangolin / Newt](https://docs.fossorial.io/) tunnel sits in front and handles TLS + host-header routing. Newt — the tunnel client — runs as a service inside this compose. Every other service binds to `127.0.0.1`; newt forwards traffic from your Pangolin server to those loopback ports per the resource rules you configure in Pangolin's UI. **There is no in-stack reverse proxy.**
+This stack assumes a [Pangolin / Newt](https://docs.fossorial.io/) tunnel sits in front and handles TLS + host-header routing. Newt — the tunnel client — runs as a service inside this compose, on the same `pia-stack` docker network as everything else. Other services don't bind host ports at all; they're reachable only by service name (`listmonk:9000`, `cryptpad:3000`) from inside that network, which is exactly where newt is. Newt forwards traffic from your Pangolin server to those service:port targets per the resource rules you configure in Pangolin's UI. **There is no in-stack reverse proxy.**
 
 If you use a different tunnel (Cloudflared, Tailscale Funnel) instead of Pangolin, comment out the `newt` service in `docker-compose.yml` and run your own tunnel client alongside the stack — everything else is tunnel-agnostic. If you have no tunnel at all and want to expose this to the public internet, you need to add a TLS layer (certbot + nginx, a separate Caddy instance, Cloudflare proxy mode at the DNS level) before doing so.
 
@@ -89,6 +91,7 @@ Backend services don't bind host ports — hit them from inside the `pia-stack` 
 docker run --rm --network pia-stack curlimages/curl:latest -sI http://mkdocs:8000/
 docker run --rm --network pia-stack curlimages/curl:latest -sI http://listmonk:9000/
 docker run --rm --network pia-stack curlimages/curl:latest -sI http://mkdocs-site-server:80/
+docker run --rm --network pia-stack curlimages/curl:latest -sI http://homepage:3000/
 docker run --rm --network pia-stack curlimages/curl:latest -sI http://cryptpad:3000/
 ```
 
@@ -119,20 +122,28 @@ The newt client is bundled in this compose; you just need to point it at your Pa
 
 **1. Register this host in Pangolin.** In the Pangolin admin UI, add a new site of type `newt`. It generates a `NEWT_ID` and `NEWT_SECRET`. Paste both into your `.env` along with `PANGOLIN_ENDPOINT` (the public URL of your Pangolin server). Bring the stack up — newt connects out and registers itself.
 
-**2. Add a Pangolin resource per subdomain you want public.** Each resource forwards to a docker service name on the `pia-stack` network — no host ports involved:
+**2. Add a Pangolin resource per subdomain you want public.** Each resource forwards to one or more docker service names on the `pia-stack` network — no host ports involved:
 
-| Subdomain | → Target |
+| Subdomain | Target(s) |
 | --- | --- |
 | `docs.yourorg.org` | `mkdocs-site-server:80` *(static Nginx — production)* or `mkdocs:8000` *(dev MkDocs — hot reload, useful during the session)* |
-| `mail.yourorg.org` | `listmonk:9000` *(Listmonk)* |
-| `pad.yourorg.org` | `cryptpad:3000` *(CryptPad main — session profile)* |
-| `pad-sandbox.yourorg.org` | `cryptpad:3000` *(CryptPad sandbox — same target, different Host header)* |
+| `mail.yourorg.org` | `listmonk:9000` |
+| `answers.yourorg.org` | `answer:80` *(visit `/install` once on first boot to run the setup wizard)* |
+| `lander.yourorg.org` | `homepage:3000` *(service dashboard — set `HOMEPAGE_ALLOWED_HOSTS=lander.yourorg.org` in `.env` once you've picked the public hostname)* |
+| `pad.yourorg.org` | **Two targets** — see CryptPad notes below |
+| `pad-sandbox.yourorg.org` | `cryptpad:3000` *(same backend as `pad.*`; sandbox separation is by Host header)* |
 
-CryptPad also needs a path-rule on `pad.yourorg.org`: `/cryptpad_websocket` → `cryptpad:3003` (WebSocket).
+In each Pangolin resource: leave **Match Path** empty for the default HTTP target. Use a **Prefix** match only when you need to send a specific path to a different upstream port (the CryptPad WebSocket is the only example here). Leave **Rewrite Path** blank — that field expects a path replacement (e.g. `/`), not a host:port.
 
 Pangolin handles TLS via Let's Encrypt at the tunnel edge.
 
-**CryptPad-specific note:** CryptPad needs both the `pad.*` and `pad-sandbox.*` domains to resolve and serve, AND it needs the `/cryptpad_websocket` path to reach the WebSocket port (`127.0.0.1:3013`). In Pangolin, that's a path-based rule on the main domain pointing at the WS port. If only the HTTP route works, the editor loads but the editing surface won't render.
+### CryptPad gotchas
+
+These will catch you out at 8am session-day if you miss them:
+
+- **Two Pangolin resources, not one.** Both `pad.*` and `pad-sandbox.*` need their own resource, both pointing at `cryptpad:3000`. CryptPad enforces sandbox separation by Host header, so the sandbox subdomain has to actually resolve. If only `pad.*` works, the editor loads but the editing surface stays blank.
+- **The `pad.*` resource needs two targets.** A default target (no Match Path) → `cryptpad:3000` for all HTTP, plus a second target with **Prefix** match `/cryptpad_websocket` → `cryptpad:3003` for the WebSocket. The WS port is **3003**, not 3013.
+- **`CRYPTPAD_MAIN_DOMAIN` and `CRYPTPAD_SANDBOX_DOMAIN` in `.env` must match the Pangolin URLs character-for-character.** CryptPad bakes them into its `Content-Security-Policy` response header. A single-letter typo (e.g. `publicinterstalberta` vs `publicinterestalberta`) means the browser refuses to load CryptPad's own assets — page goes blank with `(index)` and `/favicon.ico` 404s in DevTools. Restart the container after editing `.env`.
 
 ## Running the session profile (CryptPad)
 

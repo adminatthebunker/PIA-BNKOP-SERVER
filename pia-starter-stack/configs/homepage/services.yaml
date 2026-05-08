@@ -1,0 +1,75 @@
+---
+# https://gethomepage.dev/configs/services/
+#
+# Each service entry can carry:
+#   href           — public URL to open on click
+#   description    — one-line tagline (matches the deck's "replaces · X" voice)
+#   icon           — selfh.st / mdi / dashboardicons identifier (mdi-foo or foo.svg)
+#   server         — name from docker.yaml; enables container stat widget
+#   container      — exact docker container name on that server
+#   siteMonitor    — URL Homepage HEAD-pings every minute for status dot
+#   widget         — service-specific integration (uptime, queue depth, etc.)
+
+- Public:
+    - The site:
+        href: https://pia2026.publicinterestalberta.org
+        description: Static MkDocs — permanent record of the room's writing.
+        icon: mdi-book-open-page-variant
+        server: my-docker
+        container: pia-starter-stack-mkdocs-site-server-1
+        siteMonitor: https://pia2026.publicinterestalberta.org
+
+    - Newsletter:
+        href: https://news.publicinterestalberta.org
+        description: Listmonk — mass email without renting a vendor.
+        icon: mdi-email-newsletter
+        server: my-docker
+        container: pia-starter-stack-listmonk-1
+        siteMonitor: https://news.publicinterestalberta.org
+
+    - Q&A:
+        href: https://answers.publicinterestalberta.org
+        description: Apache Answer — public knowledge base for member questions.
+        icon: mdi-comment-question-outline
+        server: my-docker
+        container: pia-starter-stack-answer-1
+        siteMonitor: https://answers.publicinterestalberta.org
+
+- Session:
+    - CryptPad:
+        href: https://pad.publicinterestalberta.org
+        description: Collaborative markdown for the live workshop. Pairs with pad-sandbox.
+        icon: mdi-pencil-box-multiple
+        server: my-docker
+        container: pia-starter-stack-cryptpad-1
+        siteMonitor: https://pad.publicinterestalberta.org
+
+    - Live writing site:
+        href: https://pia2026live.publicinterestalberta.org
+        description: MkDocs dev server — saves rebuild instantly. Auth-gated.
+        icon: mdi-pulse
+        server: my-docker
+        container: pia-starter-stack-mkdocs-1
+        siteMonitor: https://pia2026live.publicinterestalberta.org
+
+- Operator:
+    - code-server:
+        href: https://ide.publicinterestalberta.org
+        description: Browser IDE on n3-pia. Paste, edit, mkdocs build. Auth-gated.
+        icon: mdi-code-tags
+        server: my-docker
+        container: pia-starter-stack-code-server-1
+        siteMonitor: https://ide.publicinterestalberta.org
+
+    - Pangolin tunnel:
+        href: https://pangolin.bnkserve.org
+        description: Newt site connection + resources for *.publicinterestalberta.org.
+        icon: mdi-tunnel-outline
+        server: my-docker
+        container: pia-starter-stack-newt-1
+
+    - Stack database:
+        description: Postgres backing Listmonk. No public URL — internal only.
+        icon: mdi-database
+        server: my-docker
+        container: pia-starter-stack-listmonk-db-1

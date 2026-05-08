@@ -7,6 +7,16 @@ site_url: https://pia2026.publicinterestalberta.org
 site_author: Public Interest Alberta + The Bunker Operations
 copyright: Co-written by the room at PIA 2026 · CC BY-SA 4.0
 
+# GitHub integration. repo_url + repo_name render the GitHub icon and
+# repo-stars chip in the top-right header. edit_uri adds a pencil icon
+# beside each page heading that opens the underlying markdown file in
+# GitHub's web editor — the path is relative to repo_url, so for this
+# starter stack (nested under pia-starter-stack/ inside the parent repo)
+# we have to spell out the full sub-path.
+repo_url: https://github.com/adminatthebunker/PIA-BNKOP-SERVER
+repo_name: adminatthebunker/PIA-BNKOP-SERVER
+edit_uri: edit/main/pia-starter-stack/docs/
+
 theme:
   name: material
   features:
@@ -15,6 +25,8 @@ theme:
     - navigation.top           # back-to-top button
     - navigation.sections      # top-level nav items render as section headers
     - content.code.copy        # copy-to-clipboard on code blocks
+    - content.action.edit      # pencil icon → edit this page on GitHub
+    - content.action.view      # eye icon → view raw source on GitHub
     - search.suggest
     - search.highlight
   palette:
@@ -30,9 +42,18 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  # Fonts mirror the slide deck: Space Grotesk for display/body,
+  # JetBrains Mono for code + the eyebrow/kicker/tick chrome on the home
+  # page. Pulled from Google Fonts at build time by mkdocs-material.
   font:
-    text: Roboto
-    code: Roboto Mono
+    text: Space Grotesk
+    code: JetBrains Mono
+
+# Custom stylesheet adds deck-style classes (.eyebrow, .kicker, .tick,
+# .stamp, .chrome, .hero-h1, .lead, .deck-grid, .roster) used in index.md.
+# Defined in docs/stylesheets/extra.css.
+extra_css:
+  - stylesheets/extra.css
 
 # Top-level nav. Group-research files (docs/research/group-N.md) are added
 # during the session — they get URLs at /research/group-N/ but don't appear
@@ -44,14 +65,24 @@ theme:
 # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin .)
 nav:
   - Home: index.md
+  - Lander: https://lander.publicinterestalberta.org/
+  - Slides: slides.md
+  - Resources: resources.md
+  - IRL Resources: irl-resources.md
+  - Writing: writing.md
   - Research: research.md
+  - Q&A: https://answers.publicinterestalberta.org/
+  - Install: install.md
   - Subscribe: subscribe.md
 
 # Suppress "exists in docs but not in nav" warnings for the group-N.md files
 # that get added during the session (they're reachable by URL, just not
-# listed in the side menu).
+# listed in the side menu). presentation/ is a self-contained HTML deck
+# (index.html + deck-stage.js + tweaks-panel.jsx + assets/) that mkdocs
+# copies through verbatim — listed in nav above as a relative URL.
 not_in_nav: |
   /research/*.md
+  /presentation/*
 
 markdown_extensions:
   - admonition              # !!! note / !!! warning callout boxes
@@ -78,5 +109,5 @@ extra:
       link: https://publicinterestalberta.org/
       name: Public Interest Alberta
     - icon: fontawesome/solid/envelope
-      link: mailto:contact@publicinterestalberta.org
+      link: mailto:admin@thebunkerops.ca
       name: Email PIA

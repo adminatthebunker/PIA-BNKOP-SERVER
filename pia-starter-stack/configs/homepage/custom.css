@@ -1,0 +1,139 @@
+/*
+ * Homepage theming — mirrors the slide deck and mkdocs site:
+ *   - Space Grotesk for body / display
+ *   - JetBrains Mono for kickers, status text, code-ish chrome
+ *   - Fraunces italic for the description tagline (matches .lead in extra.css)
+ *   - Material Deep Purple as the accent against a near-black aubergine bg.
+ *     Tailwind's `color: violet` defaults too bright for legible kickers, so
+ *     we override the body background and tighten the contrast curve here.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,700&display=swap');
+
+:root {
+  --hp-bg:           #14102a;   /* near-black aubergine; matches deep-purple slide chrome */
+  --hp-bg-soft:      #1f1840;   /* card surface */
+  --hp-bg-card:      #2a2150;   /* card highlight on hover */
+  --hp-accent:       #b388ff;   /* Material Deep Purple A100 — pops on the dark bg */
+  --hp-accent-soft:  #d1c4e9;   /* Material Deep Purple 100 — used for kicker labels */
+  --hp-accent-deep:  #7c4dff;   /* Material Deep Purple A200 — left-rule + status dots */
+  --hp-text:         #e9e3ff;
+  --hp-text-muted:   #a89fc4;
+  --hp-mono:         'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --hp-display:      'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --hp-serif:        'Fraunces', Georgia, serif;
+}
+
+/* Body background — flat dark aubergine. Override Tailwind violet-700 default. */
+html, body, #__next, .dark body, .dark #__next {
+  background: var(--hp-bg) !important;
+  color: var(--hp-text);
+  font-family: var(--hp-display);
+  letter-spacing: -0.005em;
+}
+
+/* Page heading + tagline area */
+header h1, .text-theme-800, .text-theme-300 {
+  font-family: var(--hp-display);
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--hp-text) !important;
+}
+
+/* Mono / kicker / chip text — tighten letter-spacing and brighten */
+.font-medium,
+.font-light,
+.uppercase,
+.tracking-wider,
+.tracking-widest,
+[class*="text-xs"] {
+  font-family: var(--hp-mono);
+  letter-spacing: 0.06em;
+}
+
+/* Group headers (Public / Session / Operator) — eyebrow treatment */
+.services-group h2,
+.bookmark-group-name,
+.service-group-name {
+  font-family: var(--hp-mono) !important;
+  text-transform: uppercase;
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.18em !important;
+  color: var(--hp-accent-soft) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding-bottom: 0.6rem;
+}
+.services-group h2::before,
+.bookmark-group-name::before {
+  content: "";
+  display: inline-block;
+  width: 1.6rem;
+  height: 2px;
+  background: var(--hp-accent-deep);
+}
+
+/* Description / lead paragraph — Fraunces italic */
+header p {
+  font-family: var(--hp-serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--hp-text-muted);
+}
+
+/* Service descriptions — keep them in Fraunces italic too, like .lead in extra.css */
+.service-description, [class*="services"] p {
+  font-family: var(--hp-serif);
+  font-style: italic;
+  color: var(--hp-text-muted);
+}
+
+/* Service cards — soft surface + left-rule accent on hover */
+.service-card,
+[class*="services"] [class*="rounded"]:has(> a) {
+  background-color: var(--hp-bg-soft) !important;
+  border-left: 2px solid transparent;
+  transition: background-color 160ms ease-out, border-color 160ms ease-out;
+}
+.service-card:hover,
+[class*="services"] [class*="rounded"]:has(> a):hover {
+  background-color: var(--hp-bg-card) !important;
+  border-left-color: var(--hp-accent-deep);
+}
+
+/* Bookmark cards — same surface */
+.bookmark-text, [class*="bookmark"] [class*="rounded"] {
+  background-color: var(--hp-bg-soft) !important;
+}
+[class*="bookmark"] [class*="rounded"]:hover {
+  background-color: var(--hp-bg-card) !important;
+}
+
+/* Status dot — sharper purple ring around healthy status */
+.status-dot,
+[class*="bg-emerald"],
+[class*="bg-green"] {
+  box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.18);
+}
+
+/* Search bar input */
+input[type="search"], input[type="text"] {
+  font-family: var(--hp-mono);
+  letter-spacing: 0.02em;
+  background-color: var(--hp-bg-soft);
+  color: var(--hp-text);
+}
+
+/* Datetime widget */
+.datetime, [class*="datetime"] {
+  font-family: var(--hp-mono);
+  letter-spacing: 0.02em;
+  color: var(--hp-text);
+}
+
+/* Resources widget (CPU / RAM / disk) — use mono for the numbers */
+[class*="resource"] {
+  font-family: var(--hp-mono);
+}

@@ -12,7 +12,7 @@ In rough priority order, with rough time estimates:
 
 - [ ] **Review the slide deck you'll actually present from** (~25 min)
 - [ ] **Stand up CryptPad + the starter stack on n3-pia** (~60–90 min)
-- [ ] **Wire up the Pangolin resources** for five new subdomains (~20 min)
+- [ ] **Wire up the Cloudflared routes** for four new subdomains (~20 min)
 - [ ] **Push the `pia-starter-stack` repo to its public Git home** (~10 min)
 - [ ] **Take the Lenovo phone photo + export the three Excalidraw illustrations** (~15 min)
 - [ ] **Rehearse the live-publish workflow** (CryptPad → SSH → save → refresh) (~30 min, do this at least twice)
@@ -63,32 +63,26 @@ If anything is wrong or sounds off, mark it. Don't fix mid-review — finish the
 Follow `presenter-laptop-prep.md` literally. Tracks 1 through 4. Quick summary of what needs to exist by the end:
 
 - [ ] **Repo published** at `git.publicinterestalberta.org/pia-starter-stack` (or `repo.bnkops.com/pia-starter-stack` — pick one and stay there)
-- [ ] **All starter-stack services running** on n3-pia (`docker compose --profile session ps` shows six `Up`):
-  - MkDocs dev → `mkdocs:8000` (docker network only)
-  - Nginx static → `mkdocs-site-server:80` (docker network only — *404 until `mkdocs build` runs, expected*)
-  - Listmonk → `listmonk:9000` (docker network only)
-  - CryptPad → `cryptpad:3000` (HTTP) + `cryptpad:3003` (WS) (docker network only)
-  - Newt → forwards out to Pangolin (no listening port)
-  - Code Server → `127.0.0.1:8889` *(host loopback — reach via SSH tunnel from laptop, do NOT publicly expose)*
-- [ ] **Pangolin resources added** for five hostnames:
-  - `pad.publicinterestalberta.org` *(CryptPad)*
-  - `pad-sandbox.publicinterestalberta.org` *(CryptPad sandbox origin)*
-  - `live.publicinterestalberta.org` *(MkDocs dev server, port 8080 — used DURING the session for hot-reload)*
-  - `pia2026.publicinterestalberta.org` *(Nginx serving the built static site, port 4004 — the permanent post-session URL)*
-  - `mail.publicinterestalberta.org` *(Listmonk, optional)*
-- [ ] **DNS records pointing at Pangolin** for all five subdomains (Pangolin auto-issues TLS once DNS resolves)
-- [ ] **All five URLs return 2xx/3xx** when curl'd from anywhere
+- [ ] **CryptPad container running** on n3-pia at `127.0.0.1:3010` (main) + `127.0.0.1:3011` (sandbox)
+- [ ] **Starter stack containers running** on n3-pia at `127.0.0.1:8080` (mkdocs) + `127.0.0.1:9001` (listmonk)
+- [ ] **Cloudflared ingress rules added** for four hostnames:
+  - `pad.publicinterestalberta.org`
+  - `pad-sandbox.publicinterestalberta.org`
+  - `pia2026.publicinterestalberta.org`
+  - `mail.publicinterestalberta.org`
+- [ ] **DNS records via `cloudflared tunnel route dns`** for all four subdomains
+- [ ] **All four URLs return 2xx/3xx** when curl'd from anywhere
 
 Verification one-liner (from your laptop):
 
 ```bash
-for sub in pad pad-sandbox live pia2026 mail; do
+for sub in pad pad-sandbox pia2026 mail; do
   curl -sI -o /dev/null -w "${sub}: %{http_code}\n" \
     "https://${sub}.publicinterestalberta.org/"
 done
 ```
 
-All five should be `200` or `302`. (Note: `pia2026` will return 404 from Nginx until you've run `mkdocs build` to populate `./site/` — that's expected before the session climax.) If you get `502`, the container's down. If you get a TLS error, the Pangolin resource isn't fully provisioned yet (DNS may still be propagating, or the cert hasn't issued). If you get DNS-fail, the CNAME wasn't added or hasn't propagated.
+All four should be `200` or `302`. If you get `502`, the container's down. If you get `530`, Cloudflared can't reach the tunnel. If you get DNS-fail, the route command didn't take.
 
 **Critical: CryptPad needs both `pad` AND `pad-sandbox` to work.** If only one is routed, the editor loads but the actual editing surface won't render. Easy mistake; painful to debug at 8am session-day.
 
@@ -112,8 +106,7 @@ cd ~/pia-demo  # or wherever you want them saved
 qrencode -o qr-repo.png      "https://git.publicinterestalberta.org/pia-starter-stack"
 qrencode -o qr-handout.png   "https://publicinterestalberta.org/resources/foss-campaigning/"
 qrencode -o qr-cryptpad.png  "https://pad.publicinterestalberta.org/pad/<your-pad-id>"
-qrencode -o qr-livesite.png  "https://live.publicinterestalberta.org/"
-qrencode -o qr-permanent.png "https://pia2026.publicinterestalberta.org/"
+qrencode -o qr-livesite.png  "https://pia2026.publicinterestalberta.org/"
 ```
 
 Print one of each per table. Bring spares — they get coffee on them.
@@ -150,7 +143,7 @@ This is the technical-execution rehearsal. End-to-end:
 4. From a second device or your phone, type a paragraph into the pad's "Group 1" section.
 5. Copy that section's markdown.
 6. Paste into a new file `docs/research/group-1.md`.
-7. Save. Refresh `https://live.publicinterestalberta.org/research/group-1/` on your phone — the dev server should already have hot-reloaded.
+7. Save. Refresh `https://pia2026.publicinterestalberta.org/research/group-1/` on your phone.
 8. **Time the whole loop.** Should be under 30 seconds with VS Code, under 60 with vim.
 
 Do this twice. The choreography is what matters — practice the *finger-flow* until you're not thinking about it.
@@ -180,7 +173,7 @@ These are sitting open. Don't go on stage with any of them unresolved.
 In rough order of probability × impact:
 
 1. **CryptPad's two-domain requirement bites you on the day.** If `pad-sandbox` isn't routed properly the editor won't render. Verify in Step 2 *before* you create the pad.
-2. **Newt tunnel drops mid-session.** If `newt` exits, all five subdomains stop resolving until it reconnects. Plan: `docker compose restart newt` on n3-pia (~10s recovery), narrate while it reconnects. Don't apologize past the 10-second mark. The Pangolin server itself dropping is unlikely but more painful — no quick fix from session-day Reed.
+2. **Cloudflared tunnel drops mid-session.** PIA's existing tunnel is shared with prod services — restarting it during your session would be bad. Plan: if the tunnel drops, restart it (~10s recovery), narrate while it reconnects. Don't apologize past the 10-second mark.
 3. **Conference WiFi blocks something.** Cell-data tether on your phone as backup. CryptPad and the live site are both on PIA's domain — if any standard HTTPS gets through, you're fine. If conference WiFi is a captive portal that blocks WebSockets, CryptPad's collaborative editing degrades — fall back to typing the markdown directly.
 4. **A pasted section breaks MkDocs YAML rendering.** Container exits, site shows last good build. Recovery: `docker compose logs mkdocs | tail -20` to find the offender, edit or delete, container restarts. Practice this once in Rehearsal B.
 5. **Your laptop dies.** The Claude Code live-debug agent has SSH to n3-pia. They can run the publish workflow from their machine. Make sure they know the workflow before the day.
@@ -211,7 +204,7 @@ If you want a literal hour-by-hour:
 | Time | Task |
 | --- | --- |
 | 8:00–8:30 | Coffee. Read this doc. Read the slide deck you're presenting from. |
-| 8:30–10:00 | Stand up the starter stack on n3-pia (`--profile session` for CryptPad). Configure Pangolin resources. Verify all URLs. |
+| 8:30–10:00 | Stand up CryptPad + starter stack on n3-pia. Wire Cloudflared. Verify all URLs. |
 | 10:00–10:30 | Push repo. Generate QR cards. Take Lenovo photo. Export Excalidraw PNGs. |
 | 10:30–11:30 | Rehearsal A — talk only. Time it. Cut what's over. |
 | 11:30–12:30 | Lunch. Walk. Don't think about it. |

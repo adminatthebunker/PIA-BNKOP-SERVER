@@ -1,0 +1,22 @@
+---
+# https://gethomepage.dev/widgets/info/
+- search:
+    provider: duckduckgo
+    focus: false
+    target: _blank
+    showSearchSuggestions: false
+
+- datetime:
+    text_size: xl
+    locale: en-CA
+    format:
+      timeStyle: short
+      dateStyle: long
+      hourCycle: h23
+      timeZone: America/Edmonton
+
+- resources:
+    label: stack
+    cpu: true
+    memory: true
+    disk: /

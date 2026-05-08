@@ -4,9 +4,21 @@ Get updates from us by email. We send action alerts, event invites, and the occa
 
 ## Sign up
 
-[**→ Subscribe to our newsletter**](http://localhost:9001/subscription/form){ .md-button .md-button--primary }
+<form method="post" action="https://news.publicinterestalberta.org/subscription/form" class="listmonk-form">
+  <div>
+    <h3>Subscribe</h3>
+    <input type="hidden" name="nonce" />
+    <p><input type="email" name="email" required placeholder="E-mail" /></p>
+    <p><input type="text" name="name" placeholder="Name (optional)" /></p>
+    <p>
+      <input id="61dce" type="checkbox" name="l" checked value="61dce1f8-738a-4501-a56d-f0b62a59cdac" />
+      <label for="61dce">Opt-in list</label>
+    </p>
+    <input type="submit" value="Subscribe" />
+  </div>
+</form>
 
-(Replace this link with your real Listmonk subscription form URL once you've created a list. The default form lives at `/subscription/form` on whatever domain you're running Listmonk under.)
+(Forking this stack? Swap the `action` URL for your own Listmonk domain and replace the checkbox `value` with your list's UUID — find it at `/admin/lists` once Listmonk's running. The default hosted form is also reachable at `/subscription/form` if you'd rather link out than embed.)
 
 ## What we send
 

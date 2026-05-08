@@ -1,0 +1,40 @@
+---
+# https://gethomepage.dev/configs/settings/
+#
+# After editing this file (or services/widgets/bookmarks), poke Homepage to
+# re-read it:
+#     curl -X POST http://homepage:3000/api/revalidate    (from inside the network)
+# Without this, the static prerender keeps serving the previous values.
+
+title: Free & Open Source Campaigning
+description: The take-home stack for Public Interest Alberta 2026 — campaign infrastructure your org owns.
+favicon: https://gethomepage.dev/img/favicon.png
+
+# Tailwind palette names. `violet` is the closest to the Material Deep Purple
+# used in the slide deck and mkdocs theme; pair with `theme: dark` for the
+# late-evening session-day look, or `light` for boardrooms.
+theme: dark
+color: violet
+
+# Compact, deck-flavoured chrome. Status dots match the slide kicker dots;
+# clean header drops the boxed look that fights the typography.
+statusStyle: dot
+headerStyle: clean
+useEqualHeights: true
+hideVersion: true
+fiveColumns: false
+target: _blank
+
+# Group layout — names match services.yaml. `style: column` stacks cards
+# vertically inside each group; the three groups then sit side-by-side as
+# columns across the page (closer to the bookmark visual at the bottom).
+layout:
+  Public:
+    style: column
+    icon: mdi-earth
+  Session:
+    style: column
+    icon: mdi-pencil-box-multiple-outline
+  Operator:
+    style: column
+    icon: mdi-tools

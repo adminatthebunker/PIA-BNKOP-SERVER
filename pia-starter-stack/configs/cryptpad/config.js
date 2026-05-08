@@ -115,7 +115,7 @@ module.exports = {
  *  or you may want to limit how much computing power CryptPad can take.
  *  If so, set 'maxWorkers' to a positive integer.
  */
-    // maxWorkers: 4,
+    maxWorkers: 4,
 
     /* =====================
      *       Sessions
@@ -289,7 +289,10 @@ module.exports = {
     /* CryptPad supports logging events directly to the disk in a 'logs' directory
      * Set its location here, or set it to false (or nothing) if you'd rather not log
      */
-    logPath: './data/logs',
+    // Disabled: container logs flow to stdout (see logToStdout below) so docker
+    // captures them via `docker compose logs cryptpad` — no on-disk log rotation
+    // to manage, no bind-mount permission risk on ./data/cryptpad/data/logs.
+    logPath: false,
 
     /* =====================
      *       Debugging
@@ -298,7 +301,7 @@ module.exports = {
     /*  CryptPad can log activity to stdout
      *  This may be useful for debugging
      */
-    logToStdout: false,
+    logToStdout: true,
 
     /* CryptPad can be configured to log more or less
      * the various settings are listed below by order of importance

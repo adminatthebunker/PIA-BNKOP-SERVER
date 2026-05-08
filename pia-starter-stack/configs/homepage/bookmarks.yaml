@@ -1,0 +1,43 @@
+---
+# https://gethomepage.dev/configs/bookmarks/
+- Movement:
+    - Public Interest Alberta:
+        - abbr: PIA
+          href: https://publicinterestalberta.org
+    - The Bunker Operations:
+        - abbr: BNK
+          href: https://bnkops.com
+
+- Source:
+    - Starter stack repo:
+        - abbr: SRC
+          href: https://github.com/adminatthebunker/PIA-BNKOP-SERVER
+    - FOSS resources handout:
+        - abbr: FOSS
+          href: https://pia2026.publicinterestalberta.org/resources/
+    - Session slides:
+        - abbr: DECK
+          href: https://pia2026.publicinterestalberta.org/slides/
+
+- Docs:
+    - MkDocs Material:
+        - abbr: MD
+          href: https://squidfunk.github.io/mkdocs-material/
+    - Listmonk:
+        - abbr: LM
+          href: https://listmonk.app/docs/
+    - Apache Answer:
+        - abbr: AA
+          href: https://answer.apache.org/docs/
+    - CryptPad:
+        - abbr: CP
+          href: https://docs.cryptpad.org/
+    - code-server:
+        - abbr: CS
+          href: https://coder.com/docs/code-server/latest
+    - Pangolin / Newt:
+        - abbr: PG
+          href: https://docs.pangolin.net/
+    - Homepage:
+        - abbr: HP
+          href: https://gethomepage.dev/

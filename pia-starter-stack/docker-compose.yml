@@ -17,6 +17,8 @@
 services:
   # ---------------------------------------------------------------------------
   # Newt — Pangolin tunnel client
+  # Docs: https://docs.pangolin.net/  ·  https://github.com/fosrl/newt
+  #
   # Connects out to a Pangolin instance and forwards traffic to backend
   # services on the `pia-stack` network by docker service name (e.g.
   # `listmonk:9000`, `cryptpad:3000`). No host port binding — Pangolin
@@ -39,6 +41,7 @@ services:
 
   # ---------------------------------------------------------------------------
   # MkDocs Material — DEV server (hot-reload)
+  # Docs: https://squidfunk.github.io/mkdocs-material/  ·  https://www.mkdocs.org/
   # Replaces: Squarespace, Notion-public, a half-built WordPress site.
   # Edit ./docs/*.md, save, refresh — the site rebuilds automatically.
   # Use this during the live session: pasting research files into ./docs/
@@ -59,16 +62,19 @@ services:
     expose:
       - "8000"
     volumes:
-      - ./mkdocs.yml:/docs/mkdocs.yml
-      - ./docs:/docs/docs
-      # Output directory for `mkdocs build` — shared with mkdocs-site-server
-      # which serves the built static files. Bind-mounting to the host means
-      # one container's build output is the other container's web root.
-      - ./site:/docs/site
+      # Mount the WHOLE project root at /docs — mkdocs expects mkdocs.yml,
+      # docs/, and site/ under its working dir, which already matches the
+      # project layout. A directory mount avoids the single-file stale-inode
+      # bug (atomic-write edits to mkdocs.yml would otherwise leave the dev
+      # server serving the old version until restart). The site/ subdir is
+      # the build output and is shared with mkdocs-site-server which serves
+      # the built static files.
+      - .:/docs
     restart: unless-stopped
 
   # ---------------------------------------------------------------------------
   # MkDocs built site — Nginx static server (production serve)
+  # Docs: https://docs.linuxserver.io/images/docker-nginx/  ·  https://nginx.org/en/docs/
   # Serves the output of `mkdocs build` (./site/) as plain static files.
   # Faster, leaner, and survives the Python process dying — but does NOT
   # auto-rebuild on content changes. Run `docker compose run --rm mkdocs \
@@ -94,6 +100,7 @@ services:
 
   # ---------------------------------------------------------------------------
   # CryptPad — collaborative pad (OPTIONAL — session infrastructure only)
+  # Docs: https://docs.cryptpad.org/  ·  https://github.com/cryptpad/cryptpad
   # Replaces: Google Docs / Etherpad-as-SaaS.
   #
   # Behind the `session` profile because most forks of this stack don't need
@@ -135,6 +142,7 @@ services:
 
   # ---------------------------------------------------------------------------
   # Listmonk — mass email / newsletter management
+  # Docs: https://listmonk.app/docs/  ·  Postgres: https://www.postgresql.org/docs/17/
   # Replaces: Mailchimp, Constant Contact
   # Reachable on the network as `listmonk:9000`.
   # ---------------------------------------------------------------------------
@@ -163,25 +171,94 @@ services:
     restart: unless-stopped
 
   # ---------------------------------------------------------------------------
+  # Apache Answer — Q&A / community knowledge base
+  # Docs: https://answer.apache.org/docs/  ·  https://github.com/apache/answer
+  # Replaces: Stack Overflow Teams, Zendesk Guide, a half-built FAQ page.
+  #
+  # A self-hosted Q&A platform (think open-membership Stack Overflow). Useful
+  # for member questions, public "ask us anything" pages, and shareable FAQs
+  # that grow with the campaign rather than rotting in a Google Doc.
+  #
+  # First-boot is a browser wizard at /install — set the admin account, pick
+  # SQLite (default, no extra service) or point at MySQL/Postgres, and go.
+  # Persistent state (SQLite DB + uploaded images) lives in the answer-data
+  # named volume; back it up alongside listmonk-db.
+  #
+  # Reachable on the network as `answer:80`.
+  # ---------------------------------------------------------------------------
+  answer:
+    image: apache/answer:latest
+    expose:
+      - "80"
+    volumes:
+      - answer-data:/data
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Homepage — service dashboard / landing page
+  # Docs: https://gethomepage.dev/  ·  https://github.com/gethomepage/homepage
+  # Replaces: hand-rolled HTML index, "where do I log in to ___?" Slack threads.
+  #
+  # gethomepage.dev — a configurable dashboard that lists your services,
+  # widgets (uptime, weather, etc.), and bookmarks. Useful as the public
+  # front door of a stack (point `lander.example.org` here) so members and
+  # staff can find every tool without memorizing subdomains.
+  #
+  # Config lives in /app/config (named volume `homepage-data`). On first
+  # boot Homepage seeds default YAML files there — edit `services.yaml`,
+  # `bookmarks.yaml`, etc. via code-server or directly in the volume.
+  #
+  # HOMEPAGE_ALLOWED_HOSTS (Homepage v1+ requirement): comma-separated list
+  # of public hostnames the dashboard will serve. `*` allows any host —
+  # convenient default but tighten in production by listing your real
+  # subdomain(s), e.g. `HOMEPAGE_ALLOWED_HOSTS=lander.example.org`.
+  #
+  # Reachable on the network as `homepage:3000`.
+  # ---------------------------------------------------------------------------
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    expose:
+      - "3000"
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=${HOMEPAGE_ALLOWED_HOSTS:-*}
+    volumes:
+      # Version-controlled config — services/settings/bookmarks/widgets/docker
+      # YAML files plus custom.css. Edit on the host and re-run `docker compose
+      # up -d homepage` to pick up changes (the container watches /app/config
+      # so most edits hot-reload without a restart).
+      - ./configs/homepage:/app/config
+      # Docker socket (read-only) — lets Homepage fetch CPU / memory / uptime
+      # for any service whose entry sets `server: my-docker`. The matching
+      # `my-docker` definition lives in configs/homepage/docker.yaml.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
   # Code Server — web IDE (admin / build convenience)
+  # Docs: https://coder.com/docs/code-server/latest  ·  https://docs.linuxserver.io/images/docker-code-server/
   # Lets you edit ./docs/*.md, edit mkdocs.yml, and run `mkdocs build` from a
   # browser instead of SSH + terminal. Useful for the session climax: paste,
   # save, click Terminal → `mkdocs build`, refresh pia2026.* on the projector.
   #
   # SECURITY: code-server provides shell access via a browser. Reachable on
-  # 127.0.0.1:8889 by default (use SSH tunnel for remote access). DO NOT
+  # 127.0.0.1:8899 by default (use SSH tunnel for remote access). DO NOT
   # publish via Pangolin without a strong password and ideally behind an
   # IP allowlist or Pangolin auth resource.
   #
-  # IMAGE: defaults to upstream `codercom/code-server:latest` (vanilla) so
-  # forks work out of the box. PIA's deployment can override to the BNKops
-  # prebuilt image (mkdocs + plugins + claude-code preinstalled):
+  # PANGOLIN ROUTE: point a Pangolin resource at `code-server:8443` (docker
+  # service name + internal port). Newt joins `pia-stack` and reaches the
+  # service directly — no host port needed for the Pangolin path.
+  #
+  # IMAGE: linuxserver-based by default (honors PUID/PGID/DEFAULT_WORKSPACE,
+  # listens on :8443). PIA's deployment overrides to the BNKops prebuilt image
+  # (same lineage; adds mkdocs + plugins + claude-code preinstalled):
   #     CODE_SERVER_IMAGE=gitea.bnkops.com/admin/code-server:latest
-  # On vanilla image, install mkdocs in the workspace terminal once:
+  # On the public `lscr.io/linuxserver/code-server` default, install mkdocs in
+  # the workspace terminal once:
   #     pip install --user "mkdocs-material[recommended]"
   # ---------------------------------------------------------------------------
   code-server:
-    image: ${CODE_SERVER_IMAGE:-codercom/code-server:latest}
+    image: ${CODE_SERVER_IMAGE:-lscr.io/linuxserver/code-server:latest}
     environment:
       - PUID=${USER_ID:-1000}
       - PGID=${GROUP_ID:-1000}
@@ -189,18 +266,47 @@ services:
       - DEFAULT_WORKSPACE=/config/workspace
       - PASSWORD=${CODE_SERVER_PASSWORD:-changeme}
     ports:
-      - "127.0.0.1:${CODE_SERVER_PORT:-8889}:8443"
+      - "127.0.0.1:${CODE_SERVER_PORT:-8899}:8443"
     volumes:
-      # Code-server's own state (settings, extensions, terminal history).
+      # Code-server state (settings, extensions, terminal history). The
+      # linuxserver image bind-mounts /config; workspace lives under it.
       - ./data/code-server:/config
-      # Workspace — what shows up in the IDE file tree.
-      - ./docs:/config/workspace/docs
-      - ./mkdocs.yml:/config/workspace/mkdocs.yml
-      - ./site:/config/workspace/site
-      - ./configs:/config/workspace/configs
-      - ./docker-compose.yml:/config/workspace/docker-compose.yml
-      # NOTE: ./.env intentionally NOT mounted — keep secrets out of the IDE.
-      # NOTE: ./data/ intentionally NOT mounted — runtime state, not editable.
+      # Mount the WHOLE project as the IDE workspace. A directory bind mount
+      # is robust against the stale-inode bug that bites single-file mounts:
+      # editors that atomic-write-and-rename (Claude's Edit tool, vim with
+      # `set backupcopy=auto`, most VS Code saves) replace the host inode,
+      # but a single-file bind mount stays pinned to the original. Whole-
+      # directory mounts re-resolve filenames each access, so they always
+      # see fresh content.
+      - .:/config/workspace
+      # Shadow ./.env (secrets) and ./data/ (runtime state) so they don't
+      # appear in the IDE. /dev/null bind-mount makes .env look like an
+      # empty file inside the container; tmpfs hides data/ behind an empty
+      # in-memory directory.
+      - /dev/null:/config/workspace/.env
+      # linuxserver init hook — scripts run as root before code-server starts.
+      # install-mkdocs.sh self-heals /config/.venv on every start (apt-installs
+      # python3 if missing; rebuilds the venv if the image's system Python
+      # changed paths). Without this, `mkdocs build` in the IDE terminal
+      # breaks any time the upstream image is rebuilt.
+      - ./configs/code-server/init.d:/custom-cont-init.d:ro
+      # Parent-vault scripts/ (pangolin-push.py and friends) accessible from
+      # the IDE workspace. The PIA deployment keeps operational tooling in
+      # ../scripts/ alongside session materials; this line lets the presenter
+      # run those scripts from code-server's terminal during the session.
+      # FORKERS: if you don't have a sibling scripts/ directory, delete this
+      # line — Docker will create an empty host dir if the path is missing,
+      # which is harmless but clutters your tree.
+      - ../scripts:/config/workspace/scripts
+      # Docker socket — lets `docker` / `docker compose` commands run from the
+      # IDE terminal and from Claude Code inside code-server. Requires the
+      # Docker CLI to be present in the container: the BNKops image includes
+      # it; on the stock linuxserver image add an init.d script to install it.
+      # SECURITY: grants full Docker access on the host from the browser IDE.
+      # Only expose code-server behind Pangolin auth or an IP allowlist.
+      - /var/run/docker.sock:/var/run/docker.sock
+    tmpfs:
+      - /config/workspace/data
     restart: unless-stopped
 
 # Single named network — every service joins by default. Naming it explicitly
@@ -213,3 +319,4 @@ networks:
 
 volumes:
   listmonk-db:
+  answer-data:

@@ -1,0 +1,9 @@
+---
+# https://gethomepage.dev/configs/docker/
+#
+# Single local socket — Homepage's container has /var/run/docker.sock
+# bind-mounted read-only (see docker-compose.yml). Each service entry in
+# services.yaml that sets `server: my-docker` will fetch CPU / memory /
+# uptime stats from this socket every minute.
+my-docker:
+  socket: /var/run/docker.sock

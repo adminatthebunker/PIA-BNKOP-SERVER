@@ -1,0 +1,490 @@
+/*
+ * Landing-page styles for docs/index.md. Mirrors a few cues from the slide
+ * deck at /presentation/ — purple accent, mono labels, Fraunces lead — but
+ * trusts Material's typography and chrome to do most of the work.
+ *
+ * Class vocabulary (apply via attr_list or md_in_html in markdown):
+ *   .eyebrow      small mono label with a leading purple bar
+ *   .kicker       small mono label, muted
+ *   .hero-h1      display headline (Space Grotesk, tight tracking)
+ *   .lead         Fraunces italic lead paragraph
+ *   .hero-split   2-col text-and-framed-photo hero layout
+ *   .stat-strip   row of "big number / small label" callouts
+ *   .stack-grid   service cards with "replaces · X" mono kicker
+ *   .pull-block   serif italic pull quote with red rule
+ *   .roster       schedule-style two-column "01 / label" layout
+ *   .cta-row      flex row of CTA buttons (.cta-primary / .cta-secondary)
+ *   .deck-grid    flexible card grid with accent left-rule per cell
+ *   .footline     mono fineprint at the bottom of the home page
+ *
+ * Fonts: Space Grotesk + JetBrains Mono come in via the theme.font config
+ * in mkdocs.yml. Fraunces is imported below for .lead only.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,700&display=swap');
+
+/* ---- Eyebrow / kicker ---- */
+
+.md-typeset .eyebrow {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--md-accent-fg-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 0.6rem;
+}
+.md-typeset .eyebrow::before {
+  content: "";
+  width: 1.6rem;
+  height: 2px;
+  background: var(--md-accent-fg-color);
+}
+
+.md-typeset .kicker {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--md-default-fg-color--light);
+  display: inline-block;
+}
+
+/* ---- Hero headline ---- */
+
+.md-typeset .hero-h1 {
+  font-weight: 700;
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0.5rem 0 0.4rem;
+  color: var(--md-default-fg-color);
+  text-wrap: balance;
+}
+.md-typeset .hero-h1 em {
+  font-style: normal;
+  color: var(--md-accent-fg-color);
+}
+/* Hide Material's ¶ permalink on the hero h1 — it isn't a section anchor. */
+.md-typeset .hero-h1 .headerlink { display: none; }
+
+/* ---- Lead pull quote — Fraunces italic ---- */
+
+.md-typeset .lead {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.35rem;
+  line-height: 1.4;
+  color: var(--md-default-fg-color);
+  max-width: 36rem;
+  margin: 1.6rem 0 2.2rem;
+}
+
+/* ---- Card grid ---- */
+
+.md-typeset .deck-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.6rem;
+  margin: 1.5rem 0 2rem;
+}
+.md-typeset .deck-grid .cell {
+  border-left: 2px solid var(--md-accent-fg-color);
+  padding: 0.2rem 0 0.2rem 1rem;
+}
+.md-typeset .deck-grid .cell .kicker {
+  margin-bottom: 0.45rem;
+}
+.md-typeset .deck-grid .cell p {
+  margin: 0.2rem 0;
+}
+
+/* ---- Roster — schedule-style two-column list ---- */
+
+.md-typeset .roster {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.92rem;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.55rem 1.4rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding: 1.1rem 0;
+  margin: 1.4rem 0 2rem;
+  align-items: baseline;
+}
+.md-typeset .roster .t {
+  color: var(--md-accent-fg-color);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.md-typeset .roster .l {
+  color: var(--md-default-fg-color);
+  font-family: var(--md-text-font-family, 'Space Grotesk', system-ui, sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ---- Tighten H1 spacing for any page using .hero-h1 ---- */
+
+.md-typeset .hero-h1 + p,
+.md-typeset .eyebrow + .hero-h1 {
+  margin-top: 0.4rem;
+}
+
+/* Slightly more breathable body text site-wide. */
+.md-typeset p { line-height: 1.65; }
+
+/* ---- Accent treatment for inline strong/em on home page ---- */
+
+.md-typeset .lead em,
+.md-typeset .lead strong {
+  color: var(--md-accent-fg-color);
+}
+
+/* ---- CTA row — primary + secondary call-to-action buttons ---- */
+
+.md-typeset .cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 1rem 0 2rem;
+  align-items: center;
+}
+.md-typeset .cta-row a {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.85rem 1.4rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.md-typeset .cta-row a.cta-primary {
+  background: var(--md-accent-fg-color);
+  color: var(--md-default-bg-color);
+  border: 2px solid var(--md-accent-fg-color);
+  box-shadow: 4px 4px 0 var(--md-default-fg-color);
+}
+.md-typeset .cta-row a.cta-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--md-default-fg-color);
+}
+.md-typeset .cta-row a.cta-secondary {
+  background: transparent;
+  color: var(--md-default-fg-color);
+  border: 2px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset .cta-row a.cta-secondary:hover {
+  border-color: var(--md-accent-fg-color);
+  color: var(--md-accent-fg-color);
+}
+
+/* ---- Stat strip — row of "big number / small label" callouts ---- */
+
+.md-typeset .stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1.4rem 2.4rem;
+  margin: 2rem 0 3rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding: 1.6rem 0;
+}
+.md-typeset .stat-strip .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.md-typeset .stat-strip .stat .num {
+  font-family: var(--md-text-font-family, 'Space Grotesk', system-ui, sans-serif);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--md-accent-fg-color);
+}
+.md-typeset .stat-strip .stat .label {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--md-default-fg-color--light);
+}
+
+/* ---- Stack grid — service cards with replaces strip ---- */
+
+.md-typeset .stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1.2rem;
+  margin: 1.4rem 0 2.2rem;
+}
+.md-typeset .stack-grid .svc {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+}
+.md-typeset .stack-grid .svc::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -1px;
+  right: -1px;
+  height: 3px;
+  background: var(--md-accent-fg-color);
+}
+.md-typeset .stack-grid .svc h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--md-default-fg-color);
+}
+/* Service heading is a link to the upstream project. Keep heading colour and
+   weight; add a subtle ↗ affordance and accent on hover. */
+.md-typeset .stack-grid .svc h3 a {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.12s ease;
+}
+.md-typeset .stack-grid .svc h3 a::after {
+  content: "↗";
+  color: var(--md-accent-fg-color);
+  font-size: 0.85em;
+  font-weight: 600;
+  opacity: 0.7;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.md-typeset .stack-grid .svc h3 a:hover {
+  color: var(--md-accent-fg-color);
+}
+.md-typeset .stack-grid .svc h3 a:hover::after {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+/* Hide Material's ¶ permalink inside service-card headings — the card heading
+   is a link to the upstream project, not an in-page anchor. */
+.md-typeset .stack-grid .svc h3 .headerlink { display: none; }
+.md-typeset .stack-grid .svc .replaces {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .stack-grid .svc .replaces b {
+  color: var(--md-accent-fg-color);
+  font-weight: 600;
+}
+.md-typeset .stack-grid .svc p {
+  font-size: 0.92rem;
+  margin: 0.2rem 0 0;
+  color: var(--md-default-fg-color);
+  line-height: 1.45;
+}
+
+/* ---- Pull section — bordered emphasis block ---- */
+
+.md-typeset .pull-block {
+  border-left: 4px solid var(--md-accent-fg-color);
+  padding: 0.6rem 0 0.6rem 1.4rem;
+  margin: 1.6rem 0 2rem;
+}
+.md-typeset .pull-block .quote {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 1.3;
+  color: var(--md-default-fg-color);
+  display: block;
+}
+.md-typeset .pull-block .attrib {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--md-default-fg-color--light);
+  margin-top: 0.6rem;
+  display: block;
+}
+
+/* ---- Hero split — text on the left, framed photo on the right ---- */
+
+.md-typeset .hero-split {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  margin: 1rem 0 2.4rem;
+}
+@media screen and (max-width: 60em) {
+  .md-typeset .hero-split { grid-template-columns: 1fr; gap: 1.4rem; }
+}
+
+.md-typeset .hero-split .frame {
+  border: 2px solid var(--md-default-fg-color--lightest);
+  padding: 0.55rem;
+  background: var(--md-default-bg-color);
+  box-shadow: 10px 10px 0 var(--md-accent-fg-color);
+  transform: rotate(-1.2deg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 24rem;
+  justify-self: center;
+}
+.md-typeset .hero-split .frame:hover {
+  transform: rotate(0);
+  box-shadow: 14px 14px 0 var(--md-accent-fg-color);
+}
+.md-typeset .hero-split .frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.md-typeset .hero-split .frame .caption {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding-top: 0.4rem;
+  border-top: 1px dashed var(--md-default-fg-color--lightest);
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .hero-split .frame .caption .accent { color: var(--md-accent-fg-color); }
+
+/* ---- Listmonk inline subscribe form ---- */
+
+.md-typeset .listmonk-form {
+  max-width: 28rem;
+  margin: 1.4rem 0 2.2rem;
+  padding: 1.6rem 1.6rem 1.4rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  background: var(--md-default-bg-color);
+  box-shadow: 8px 8px 0 var(--md-accent-fg-color);
+  position: relative;
+}
+.md-typeset .listmonk-form::before {
+  content: "// SUBSCRIBE";
+  position: absolute;
+  top: -0.62rem;
+  left: 1.2rem;
+  background: var(--md-default-bg-color);
+  padding: 0 0.5rem;
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--md-accent-fg-color);
+}
+
+.md-typeset .listmonk-form h3 {
+  font-family: var(--md-text-font-family, 'Space Grotesk', system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset .listmonk-form p { margin: 0 0 0.7rem; }
+
+.md-typeset .listmonk-form input[type="email"],
+.md-typeset .listmonk-form input[type="text"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  border: 1.5px solid var(--md-default-fg-color--lightest);
+  border-radius: 0;
+  padding: 0.7rem 0.85rem;
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.md-typeset .listmonk-form input[type="email"]:focus,
+.md-typeset .listmonk-form input[type="text"]:focus {
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 4px 4px 0 var(--md-accent-fg-color);
+}
+
+.md-typeset .listmonk-form input[type="checkbox"] {
+  accent-color: var(--md-accent-fg-color);
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-right: 0.5rem;
+  vertical-align: -2px;
+}
+.md-typeset .listmonk-form label {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light);
+  cursor: pointer;
+}
+
+.md-typeset .listmonk-form input[type="submit"] {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--md-default-bg-color);
+  background: var(--md-accent-fg-color);
+  border: 2px solid var(--md-accent-fg-color);
+  border-radius: 0;
+  padding: 0.8rem 1.4rem;
+  margin-top: 0.4rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--md-default-fg-color);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.md-typeset .listmonk-form input[type="submit"]:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--md-default-fg-color);
+}
+.md-typeset .listmonk-form input[type="submit"]:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 var(--md-default-fg-color);
+}
+
+/* ---- Footer line — small mono fineprint ---- */
+
+.md-typeset .footline {
+  font-family: var(--md-code-font-family, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--md-default-fg-color--light);
+  margin: 2.4rem 0 0;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  padding-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.md-typeset .footline .red,
+.md-typeset .footline a {
+  color: var(--md-accent-fg-color);
+}

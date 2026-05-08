@@ -1,0 +1,1726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Free &amp; Open Source Campaigning — PIA 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,700&display=swap" rel="stylesheet">
+<script src="deck-stage.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<style>
+:root{
+  --ink:#0d0e10;
+  --ink-2:#16181c;
+  --ink-3:#1f2227;
+  --paper:#f4efe4;
+  --paper-2:#e8e1cf;
+  --red:#a78bfa;
+  --red-deep:#6d28d9;
+  --rule:#2a2d33;
+  --muted:#8a8f99;
+  --sans:'Space Grotesk', system-ui, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, monospace;
+  --serif:'Fraunces', Georgia, serif;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{background:#000; color:var(--paper); font-family:var(--sans);}
+deck-stage{ background:#000; }
+section{
+  width:1920px; height:1080px;
+  background:var(--ink);
+  color:var(--paper);
+  position:relative;
+  overflow:hidden;
+  padding:96px 120px;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Universal slide chrome */
+.chrome{
+  position:absolute; inset:0;
+  pointer-events:none;
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding:40px 60px;
+  font-family:var(--mono);
+  font-size:24px;
+  letter-spacing:0.02em;
+  color:var(--muted);
+  z-index:5;
+}
+.chrome .row{ display:flex; justify-content:space-between; align-items:center;}
+.chrome .tick{ color:var(--red); }
+
+/* Type system */
+h1, h2, h3{ font-family:var(--sans); font-weight:700; letter-spacing:-0.02em; line-height:0.96;}
+h1{ font-size:200px; }
+h2{ font-size:128px; }
+h3{ font-size:84px; }
+.eyebrow{
+  font-family:var(--mono); font-size:24px; font-weight:500;
+  text-transform:uppercase; letter-spacing:0.18em;
+  color:var(--red);
+  display:inline-flex; align-items:center; gap:14px;
+}
+.eyebrow::before{
+  content:""; width:36px; height:3px; background:var(--red);
+}
+.body{
+  font-size:34px; line-height:1.4; max-width:1200px;
+  font-weight:400;
+}
+.body.lg{ font-size:42px; line-height:1.35; }
+.kicker{
+  font-family:var(--mono); font-size:24px; color:var(--muted);
+  text-transform:uppercase; letter-spacing:0.16em;
+}
+.serif{ font-family:var(--serif); font-style:italic; }
+
+strong{ color:#fff; font-weight:700; }
+em{ color:var(--red); font-style:normal; font-weight:600;}
+
+/* Section dividers */
+.section-divider{
+  background: var(--red);
+  color:var(--ink);
+  padding:0;
+  justify-content:center;
+  align-items:flex-start;
+}
+.section-divider .num{
+  font-family:var(--mono); font-size:28px; letter-spacing:0.2em;
+  color:var(--ink); opacity:.7;
+}
+.section-divider h1{
+  font-size:340px; line-height:0.85; color:var(--ink);
+  letter-spacing:-0.04em;
+}
+.section-divider .sub{
+  font-family:var(--mono); font-size:30px; color:var(--ink);
+  margin-top:32px; letter-spacing:0.05em;
+}
+.section-divider .marks{
+  position:absolute; left:0; right:0; bottom:60px;
+  display:flex; justify-content:space-between;
+  padding:0 60px;
+  font-family:var(--mono); font-size:24px; color:var(--ink); opacity:.7;
+}
+
+/* Title slide */
+.title{
+  background:#05060a;
+  padding:80px 100px;
+  position:relative;
+  isolation:isolate;
+}
+.title::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image:url('assets/bg-gits-skyline.png');
+  background-size:cover; background-position:center;
+  opacity:0.55;
+  z-index:-2;
+  filter: saturate(0.85) hue-rotate(-6deg) brightness(0.9);
+}
+.title::after{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(120, 150, 200, 0.18) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(5,6,10,0.55) 0%, rgba(5,6,10,0.20) 30%, rgba(5,6,10,0.85) 78%, rgba(5,6,10,0.98) 100%),
+    linear-gradient(90deg, rgba(5,6,10,0.85) 0%, rgba(5,6,10,0.10) 18%, rgba(5,6,10,0.10) 82%, rgba(5,6,10,0.85) 100%);
+  z-index:-1;
+}
+.title .scanlines{
+  position:absolute; inset:0;
+  background-image: repeating-linear-gradient(
+    0deg, transparent 0 2px, rgba(255,255,255,0.025) 2px 3px
+  );
+  pointer-events:none;
+  z-index:-1;
+  mix-blend-mode:overlay;
+}
+.title .top{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  font-family:var(--mono); font-size:24px; color:var(--muted);
+}
+.title .top .stamp{
+  border:2px solid var(--red); color:var(--red); padding:12px 18px;
+  letter-spacing:0.18em; text-transform:uppercase;
+}
+.title .center{
+  flex:1; display:flex; flex-direction:column; justify-content:center;
+}
+.title h1{
+  font-size:200px; line-height:0.92;
+  text-shadow: 0 2px 30px rgba(0,0,0,0.85), 0 0 60px rgba(0,0,0,0.6);
+  color: #eaf2f7;
+}
+.title h1 em{
+  color:var(--red); font-style:normal;
+  text-shadow: 0 0 24px rgba(230, 57, 70, 0.45), 0 2px 30px rgba(0,0,0,0.85);
+}
+.title .meta{
+  display:flex; gap:60px; align-items:flex-end;
+  border-top:2px solid var(--rule);
+  padding-top:32px;
+  font-family:var(--mono); font-size:24px;
+}
+.title .meta .who{ color:var(--paper); }
+.title .meta .who b{ color:var(--red); display:block; font-size:36px; letter-spacing:-0.01em; font-weight:700; margin-bottom:6px;}
+.title .meta .who .kicker{ font-size:24px; }
+.title .barcode{
+  display:flex; gap:3px; align-items:flex-end; height:60px;
+}
+.title .barcode i{
+  display:block; background:var(--paper); width:4px; height:100%;
+}
+
+/* Frame helpers */
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:80px; flex:1; align-items:center; }
+.grid-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:48px; flex:1; align-items:start;}
+.flex-row{ display:flex; gap:48px; align-items:center; }
+.stack{ display:flex; flex-direction:column; gap:32px;}
+.stack-sm{ display:flex; flex-direction:column; gap:16px;}
+
+/* Meme presentation */
+.meme-slide{
+  display:grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap:80px;
+  align-items:center;
+}
+.meme-frame{
+  background:var(--paper);
+  padding:24px;
+  border:1px solid var(--paper-2);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  transform: rotate(-1.2deg);
+}
+.meme-frame.right{ transform: rotate(1deg);}
+.meme-frame img{ display:block; width:100%; height:auto; }
+.meme-frame .cap{
+  font-family:var(--mono); font-size:24px; color:var(--ink);
+  padding:14px 6px 4px; display:flex; justify-content:space-between;
+  border-top:1px dashed #999;
+  margin-top:12px;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+}
+.meme-solo{
+  display:grid; grid-template-columns:1fr; place-items:center;
+  height:100%;
+}
+.meme-solo .meme-frame{ max-width:1100px; }
+
+/* Tables */
+table{ width:100%; border-collapse:collapse; font-size:32px;}
+th, td{
+  text-align:left; padding:24px 20px;
+  border-bottom:1px solid var(--rule);
+  vertical-align:top;
+}
+th{
+  font-family:var(--mono); font-size:24px; text-transform:uppercase;
+  letter-spacing:0.12em; color:var(--muted); font-weight:500;
+  border-bottom:2px solid var(--red);
+  padding-bottom:14px;
+}
+td.num{ font-family:var(--mono); color:var(--red); white-space:nowrap;}
+td.deal{ font-weight:700; color:#fff;}
+
+/* Quote */
+.pull{
+  border-left:6px solid var(--red);
+  padding:24px 0 24px 48px;
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:56px; line-height:1.2;
+  color:#fff;
+  font-weight:500;
+}
+.pull .attrib{
+  font-family:var(--mono); font-style:normal; font-size:24px;
+  color:var(--muted); margin-top:32px; letter-spacing:0.05em; display:block;
+}
+
+/* Lists */
+ul.bullets{ list-style:none; }
+ul.bullets li{
+  font-size:38px; line-height:1.35; padding:18px 0;
+  border-bottom:1px solid var(--rule);
+  display:flex; gap:24px; align-items:baseline;
+}
+ul.bullets li::before{
+  content:"//"; color:var(--red); font-family:var(--mono);
+  font-size:24px; font-weight:700;
+}
+ul.bullets li b{ color:#fff; }
+
+/* Big stat */
+.bigstat{
+  font-size:300px; font-weight:700; line-height:0.9;
+  letter-spacing:-0.04em; color:var(--red);
+  font-family:var(--sans);
+}
+.bigstat .unit{ color:var(--paper); font-size:64px; vertical-align:top; margin-left:12px;}
+
+/* Live/URL plates */
+.url-plate{
+  background:var(--paper);
+  color:var(--ink);
+  padding:36px 48px;
+  font-family:var(--mono);
+  font-size:54px; font-weight:700;
+  display:inline-block;
+  margin:24px 0;
+  border:4px solid var(--ink);
+  box-shadow: 12px 12px 0 var(--red);
+  letter-spacing:-0.01em;
+  word-break:break-all;
+}
+.url-plate.sm{ font-size:38px; padding:24px 32px;}
+.url-plate .scheme{ color:var(--red); }
+
+/* Tag chips */
+.tag{
+  display:inline-block;
+  font-family:var(--mono); font-size:24px;
+  text-transform:uppercase; letter-spacing:0.16em;
+  padding:6px 14px;
+  border:1.5px solid var(--rule);
+  color:var(--paper);
+  margin-right:8px;
+}
+.tag.red{ border-color:var(--red); color:var(--red);}
+
+/* Schedule */
+.sched{
+  display:grid;
+  grid-template-columns: 200px 1fr;
+  gap:0 48px;
+  font-family:var(--sans);
+  font-size:36px;
+}
+.sched .t{
+  font-family:var(--mono);
+  color:var(--red);
+  padding:22px 0;
+  border-bottom:1px solid var(--rule);
+}
+.sched .l{
+  padding:22px 0;
+  border-bottom:1px solid var(--rule);
+  color:#fff;
+}
+
+/* QR placeholder */
+.qr{
+  width:280px; height:280px;
+  background:
+    repeating-linear-gradient(45deg, var(--ink) 0 8px, var(--paper) 8px 16px);
+  border:8px solid var(--paper);
+  outline:2px solid var(--ink);
+  position:relative;
+}
+.qr::before, .qr::after{
+  content:""; position:absolute; width:60px; height:60px;
+  background:var(--ink);
+  border:14px solid var(--paper);
+  outline:2px solid var(--ink);
+}
+.qr::before{ top:10px; left:10px; }
+.qr::after{ top:10px; right:10px; }
+
+/* Gov flags strip */
+.flags{ display:grid; grid-template-columns: 1fr 1fr; gap:32px 64px; font-size:38px; }
+.flags .flag{ display:flex; gap:24px; align-items:flex-start; padding:24px 0; border-top:1px solid var(--rule);}
+.flags .flag .em{ font-size:56px; }
+.flags .flag b{ color:#fff; display:block;}
+.flags .flag span{ color:var(--muted); font-size:28px;}
+
+/* Cost compare */
+.compare{
+  display:grid; grid-template-columns:1fr 1fr; gap:60px; flex:1; align-items:stretch;
+}
+.compare .col{
+  border:2px solid var(--rule); padding:48px;
+  display:flex; flex-direction:column; gap:24px;
+  background:var(--ink-2);
+}
+.compare .col.win{
+  border-color:var(--red); background:linear-gradient(180deg, rgba(230,57,70,0.08), transparent 60%);
+}
+.compare .col h4{
+  font-family:var(--mono); text-transform:uppercase; letter-spacing:0.14em;
+  font-size:24px; color:var(--muted); font-weight:500;
+}
+.compare .col .name{ font-size:64px; font-weight:700; line-height:1; color:#fff;}
+.compare .col.win .name{ color:var(--red); }
+.compare .col .row{
+  display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:1px solid var(--rule); padding:14px 0; font-size:26px;
+}
+.compare .col .row b{ font-family:var(--mono); font-size:28px; }
+.compare .col .total{
+  margin-top:auto; padding-top:24px; border-top:2px solid var(--rule);
+  display:flex; justify-content:space-between; align-items:baseline;
+}
+.compare .col .total span{ font-family:var(--mono); font-size:24px; text-transform:uppercase; letter-spacing:0.14em; color:var(--muted);}
+.compare .col .total b{ font-size:72px; color:#fff; font-family:var(--sans);}
+.compare .col.win .total b{ color:var(--red); }
+
+/* Rent box */
+.rent{
+  display:grid; grid-template-columns: 1fr 1fr; gap:24px 48px;
+}
+.rent .item{
+  border-top:2px solid var(--red);
+  padding:18px 0;
+  font-size:30px;
+}
+.rent .item b{ color:#fff; display:block; font-size:36px; margin-bottom:6px;}
+
+/* Diagram for thousand lists */
+.dist-diagram{
+  display:grid; grid-template-columns: 1fr 1fr; gap:80px; align-items:center;
+}
+.diagram-svg{ width:100%; height:auto;}
+
+/* Final ask grid */
+.contacts{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:32px; margin-top:auto;
+}
+.contacts .item{
+  border:2px solid var(--rule); padding:28px;
+  display:flex; flex-direction:column; gap:14px;
+}
+.contacts .item .qr{ width:160px; height:160px;}
+.contacts .item h5{
+  font-family:var(--mono); text-transform:uppercase; letter-spacing:0.14em;
+  font-size:24px; color:var(--red); font-weight:500;
+}
+.contacts .item p{ font-size:24px; color:var(--paper); font-family:var(--mono); word-break:break-all;}
+
+/* Tools translation table */
+.tools-tbl td{ font-size:30px; padding:20px 16px;}
+.tools-tbl td:nth-child(1){ color:var(--muted); text-decoration:line-through; }
+.tools-tbl td:nth-child(2){ color:#fff; font-weight:700; font-family:var(--mono);}
+.tools-tbl td:nth-child(3){ color:var(--paper);}
+
+/* utility */
+.spacer{ flex:1; }
+.right{ text-align:right; }
+.center-content{ display:flex; flex-direction:column; justify-content:center; flex:1;}
+.dim{ color:var(--muted);}
+.red{ color:var(--red);}
+.white{ color:#fff;}
+
+/* Bottom signature for body slides */
+.sig{
+  position:absolute; left:120px; right:120px; bottom:40px;
+  display:flex; justify-content:space-between; align-items:center;
+  font-family:var(--mono); font-size:24px; color:var(--muted);
+  letter-spacing:0.06em;
+  border-top:1px solid var(--rule); padding-top:18px;
+}
+.sig .red{ color:var(--red);}
+
+/* Big single-word slide */
+.shout{
+  display:flex; flex-direction:column; justify-content:center; flex:1; gap:48px;
+}
+.shout .lead{ font-size:56px; max-width:1400px; line-height:1.2;}
+.shout .punch{
+  font-size:240px; font-weight:700; letter-spacing:-0.04em; line-height:0.9;
+  color:#fff;
+}
+.shout .punch em{ color:var(--red); font-style:normal;}
+
+/* Dot pattern bg */
+.dot-bg{
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+/* Receipts (rent table style) */
+.receipt{
+  background:var(--paper);
+  color:var(--ink);
+  padding:48px 56px;
+  font-family:var(--mono);
+  position:relative;
+  box-shadow: 12px 12px 0 var(--red);
+  max-width:1080px;
+}
+.receipt h4{
+  font-size:22px; text-transform:uppercase; letter-spacing:0.18em;
+  font-weight:700; margin-bottom:24px;
+  border-bottom:2px dashed var(--ink); padding-bottom:14px;
+  display:flex; justify-content:space-between;
+}
+.receipt .line{
+  display:flex; justify-content:space-between; align-items:baseline;
+  padding:10px 0; font-size:24px;
+  border-bottom:1px dotted #aaa;
+}
+.receipt .line b{ font-weight:700;}
+.receipt .total{
+  display:flex; justify-content:space-between;
+  padding:18px 0 6px; font-size:32px; font-weight:700;
+  border-top:2px solid var(--ink); margin-top:14px;
+}
+
+</style>
+</head>
+<body>
+<deck-stage>
+
+<!-- 1. TITLE -->
+<section data-screen-label="01 Title" class="title">
+  <div class="scanlines"></div>
+  <div class="top">
+    <div>
+      <div class="stamp">PIA · 2026 · SESSION 04</div>
+    </div>
+    <div class="right">
+      <div>FILE / 01 OF 43</div>
+      <div>EDMONTON · ALBERTA</div>
+    </div>
+  </div>
+  <div class="center">
+    <div class="eyebrow" style="margin-bottom:48px;">A working session for organizers</div>
+    <h1 style="font-size:200px;">Free<br>&amp; Open Source<br><em>Campaigning.</em></h1>
+  </div>
+  <div class="meta">
+    <div class="who">
+      <div class="kicker">Speaker</div>
+      <b>Reed Larsen</b>
+      <span style="font-size:24px;">they/them · The Bunker Operations</span>
+    </div>
+    <div class="who">
+      <div class="kicker">Duration</div>
+      <b>80 minutes</b>
+      <span style="font-size:24px;">hands-on · no installs</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="barcode" aria-hidden="true">
+      <i style="height:60%;"></i><i style="height:90%;"></i><i style="height:40%;"></i><i style="height:80%;"></i><i style="height:70%;"></i><i style="height:30%;"></i><i style="height:90%;"></i><i style="height:60%;"></i><i style="height:50%;"></i><i style="height:80%;"></i><i style="height:40%;"></i><i style="height:90%;"></i><i style="height:30%;"></i><i style="height:80%;"></i><i style="height:60%;"></i><i style="height:90%;"></i>
+    </div>
+  </div>
+</section>
+
+<!-- 2. HELLO -->
+<section data-screen-label="02 Hello">
+  <div class="chrome"><div class="row"><span class="tick">// HELLO</span><span>PIA · 2026</span></div></div>
+  <div class="center-content">
+    <div class="eyebrow">Hello</div>
+    <h2 style="margin-top:28px; margin-bottom:48px;">I'm Reed.<br><span class="dim">they/them.</span></h2>
+    <p class="body lg" style="max-width:1500px;">
+      Co-founder of <strong>The Bunker Operations</strong> — a Canadian worker co-op
+      building <em>sovereign, open-source infrastructure</em> for grassroots organizations.
+    </p>
+    <p class="body lg" style="margin-top:40px; max-width:1500px;">
+      Four years with Councillor Janz. Now: <strong>AB for Abortion</strong>, <strong>Pride Corner</strong>,
+      <em>and</em> <strong>PIA</strong>.
+    </p>
+  </div>
+  <div class="sig"><span>02 / Hello</span><span class="red">bnkops.com</span></div>
+</section>
+
+<!-- 3. SCHEDULE -->
+<section data-screen-label="03 Schedule">
+  <div class="chrome"><div class="row"><span class="tick">// AGENDA</span><span>80 MINUTES</span></div></div>
+  <div class="eyebrow">The next 80 minutes</div>
+  <h2 style="margin-top:32px; margin-bottom:64px;">Run of show.</h2>
+  <div class="sched" style="max-width:1500px;">
+    <div class="t">0–10</div><div class="l">Set the table</div>
+    <div class="t">10–22</div><div class="l">Why this is urgent</div>
+    <div class="t">22–32</div><div class="l">Live server tour</div>
+    <div class="t">32–50</div><div class="l">You design the build</div>
+    <div class="t">50–55</div><div class="l">Vote</div>
+    <div class="t">55–72</div><div class="l">We deploy it, live</div>
+    <div class="t">72–80</div><div class="l">Where to from here</div>
+  </div>
+  <div class="sig"><span>03 / Run of show</span><span class="red">pia2026.publicinterestalberta.org</span></div>
+</section>
+
+<!-- 3.5 RULES OF SHOW -->
+<section data-screen-label="03.5 Rules of show">
+  <div class="chrome"><div class="row"><span class="tick">// HOUSE RULES</span><span>FOUR OF THEM</span></div></div>
+  <div class="eyebrow">Before we start</div>
+  <h2 style="margin-top:32px; margin-bottom:48px;">Rules of show.</h2>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:40px 80px; max-width:1700px;">
+    <div style="border-top:3px solid var(--red); padding-top:20px;">
+      <div class="kicker red">RULE 01 — THE CHAIR</div>
+      <p class="body" style="font-size:32px; margin-top:10px;">For this session, <strong>I'm playing instructor.</strong> I reserve the right to keep us on track.</p>
+    </div>
+    <div style="border-top:3px solid var(--red); padding-top:20px;">
+      <div class="kicker red">RULE 02 — INTERRUPT</div>
+      <p class="body" style="font-size:32px; margin-top:10px;"><strong>Ask anything, anytime.</strong> Just be patient if the answer is <em>"later."</em></p>
+    </div>
+    <div style="border-top:3px solid var(--red); padding-top:20px;">
+      <div class="kicker red">RULE 03 — I'M A GENERALIST</div>
+      <p class="body" style="font-size:32px; margin-top:10px;">I'm not a deep expert. <strong>If you can add to something, please do.</strong> We'll have time to share — and we're building an artifact together.</p>
+    </div>
+    <div style="border-top:3px solid var(--red); padding-top:20px;">
+      <div class="kicker red">RULE 04 — IT'S ITERATIVE</div>
+      <p class="body" style="font-size:32px; margin-top:10px;">This is a <strong>working session.</strong> Work with the room, work alone — both are fine.</p>
+    </div>
+  </div>
+  <div class="sig"><span>03.5 / Rules</span><span class="red">interrupt early, share often</span></div>
+</section>
+
+<!-- 4. THE DEAL -->
+<section data-screen-label="04 The deal">
+  <div class="chrome"><div class="row"><span class="tick">// THE DEAL</span><span>HANDS-ON</span></div></div>
+  <div class="center-content">
+    <div class="eyebrow">The promise</div>
+    <h2 style="margin-top:28px; margin-bottom:56px;">We're going to <em>build PIA's server</em> together.</h2>
+    <p class="body lg" style="max-width:1600px;">
+      Together, in this room. In groups. In a browser tab. <strong>No installs. No signups.</strong>
+    </p>
+    <p class="body lg" style="margin-top:32px; max-width:1600px;">
+      Anything we put on it today will be <em>free for you</em> — for as long as it is maintained.
+    </p>
+    <p class="body lg" style="margin-top:32px; max-width:1600px;">
+      Not a souvenir. <strong>A real server. A real URL. Yours.</strong>
+    </p>
+  </div>
+  <div class="sig"><span>04 / The promise</span><span class="red">free · forever-ish · ours</span></div>
+</section>
+
+<!-- 5. QUESTION FOR THE ROOM -->
+<section data-screen-label="05 Question" class="dot-bg">
+  <div class="chrome"><div class="row"><span class="tick">// PROMPT</span><span>FOR THE ROOM</span></div></div>
+  <div class="center-content" style="justify-content:center;">
+    <div class="eyebrow" style="margin-bottom:48px;">A question for the room</div>
+    <p class="pull" style="font-size:96px; max-width:1600px;">
+      What does your organization pay for every month that you'd cancel <em>tomorrow</em> if you could?
+    </p>
+  </div>
+  <div class="sig"><span>05 / Prompt</span><span class="red">discuss · 90 sec</span></div>
+</section>
+
+<!-- 6. SECTION DIVIDER: THE CASE -->
+<section data-screen-label="06 § The case" class="section-divider">
+  <div style="padding:80px 100px; width:100%;">
+    <div class="num">PART · 01</div>
+    <h1 style="margin-top:40px;">THE<br>CASE.</h1>
+    <div class="sub">Why this is urgent — 12 minutes</div>
+  </div>
+  <div class="marks">
+    <span>10 — 22</span>
+    <span>★ ★ ★</span>
+    <span>PIA / 2026</span>
+  </div>
+</section>
+
+<!-- 7. SOFTWARE IS POLITICAL -->
+<section data-screen-label="07 Software is political">
+  <div class="chrome"><div class="row"><span class="tick">// AXIOM</span><span>07</span></div></div>
+  <div class="eyebrow">Axiom</div>
+  <h2 style="margin-top:32px; max-width:1700px;">Software is <em>political.</em></h2>
+  <div class="grid-2" style="margin-top:80px;">
+    <div>
+      <p class="body lg">
+        Every login form, every database, every email through a corporate server is a <strong>political artifact</strong>.
+      </p>
+    </div>
+    <div>
+      <p class="body lg">
+        The question isn't <em>whether</em> software is political.
+      </p>
+      <p class="body lg" style="margin-top:32px;">
+        The question is <strong>whose politics.</strong>
+      </p>
+    </div>
+  </div>
+  <div class="sig"><span>07 / Axiom</span><span class="red">whose politics?</span></div>
+</section>
+
+<!-- 8. POLITICAL INDUSTRIAL COMPLEX — combined: meme + Dobson quote -->
+<section data-screen-label="08 Political industrial complex">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 01 + QUOTE</span><span>ALWAYS HAS BEEN · DOBSON 2021</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div style="max-width:1100px;">
+      <div class="eyebrow">Receipt</div>
+      <h3 style="margin-top:18px; margin-bottom:28px;">The Political<br>Industrial<br>Complex.</h3>
+      <p class="pull" style="font-size:42px; line-height:1.15; margin:0 0 24px; border-left:3px solid var(--red); padding-left:24px;">
+        Today's political system is an industry. The political industry has an incentive to <em>increase</em> political spending.
+        <span class="attrib" style="font-size:22px; margin-top:14px;">— David Dobson · Forbes · 2021</span>
+      </p>
+      <p class="body" style="font-size:30px;">The same SaaS sells to your union, your party, <em>and</em> the agencies surveilling all of you.</p>
+      <p class="kicker" style="margin-top:18px;">Not ideologically aligned. Just extractive.</p>
+    </div>
+    <div class="meme-frame right" style="align-self:center;">
+      <img src="assets/meme-always-has-been.png" alt="Always has been meme">
+      <div class="cap"><span>file: meme-always-has-been</span><span>★ 08</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>08 / Receipt + Dobson</span><span class="red">extraction is the product</span></div>
+</section>
+
+<!-- 09B. STATESIDE DATA FLOWS -->
+<section data-screen-label="10 Stateside data flows">
+  <div class="chrome"><div class="row"><span class="tick">// EVIDENCE</span><span>n=THOUSANDS</span></div></div>
+  <div style="display:grid; grid-template-columns: 1fr 1.4fr; gap:64px; flex:1; align-items:center;">
+    <div>
+      <div class="eyebrow">Where the data lives</div>
+      <h3 style="margin-top:24px; font-size:72px; line-height:1;">Almost <em>all</em><br>Canadian<br>political data<br>is stateside.</h3>
+      <p class="body" style="margin-top:32px;">
+        The Alberta referendum? <em>Stateside.</em> Your CRM? <em>Stateside.</em> Your members' addresses, donations, voting history — <em>stateside.</em>
+      </p>
+      <p class="kicker red" style="margin-top:32px; font-size:30px; letter-spacing:0.06em; text-transform:none;">
+        Who wins when both sides pay American oligarchs?
+      </p>
+    </div>
+    <div style="position:relative;">
+      <div style="border:2px solid var(--rule); padding:14px; background:#000;">
+        <img src="assets/data-flows-stateside.png" alt="Map showing data flows from Canadian political organizations to US-hosted SaaS providers" style="display:block; width:100%; height:auto;">
+      </div>
+      <div class="kicker" style="margin-top:14px; font-family:var(--mono); display:flex; justify-content:space-between;">
+        <span>fig. 01 — outbound data flows · CA → US</span>
+        <span class="red">★ ★ ★</span>
+      </div>
+      <div class="kicker" style="margin-top:8px; font-family:var(--mono); font-size:22px; letter-spacing:0.04em; text-transform:none;">
+        source: <a href="https://canadianpoliticaldata.org" target="_blank" rel="noopener" style="color:var(--paper); text-decoration:underline; text-underline-offset:4px;">canadianpoliticaldata.org</a>
+      </div>
+    </div>
+  </div>
+  <div class="sig"><span>10 / The map</span><span class="red">not theirs to lose — yours</span></div>
+</section>
+
+<!-- 10. THIS IS FINE meme -->
+<section data-screen-label="10 This is fine">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 02</span><span>THIS IS FINE</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div class="meme-frame">
+      <img src="assets/meme-this-is-fine.png" alt="This is fine — our movement on Mailchimp">
+      <div class="cap"><span>file: our-movement-on-mailchimp</span><span>★ 10</span></div>
+    </div>
+    <div>
+      <div class="eyebrow">Status report</div>
+      <h3 style="margin-top:24px;">Our movement,<br>on Mailchimp.</h3>
+      <p class="body" style="margin-top:32px;">It's been working <em>fine</em>. Until the day it isn't.</p>
+    </div>
+  </div>
+  <div class="sig"><span>10 / Status report</span><span class="red">this is fine</span></div>
+</section>
+
+<!-- 11. DOCTOROW -->
+<section data-screen-label="11 Doctorow">
+  <div class="chrome"><div class="row"><span class="tick">// QUOTE</span><span>DOCTOROW · 2023</span></div></div>
+  <div class="center-content">
+    <div class="eyebrow">Cory Doctorow names it</div>
+    <p class="pull" style="font-size:60px; margin-top:32px; max-width:1750px;">
+      Platforms die because they were always going to die. First they're good to their users; then they abuse their users to make things <em>better</em> for their business customers; finally they abuse those business customers to <em>claw back</em> all the value for themselves.
+      <span class="attrib">— Enshittification · 2023</span>
+    </p>
+  </div>
+  <div class="sig"><span>11 / Doctorow</span><span class="red">enshittification</span></div>
+</section>
+
+<!-- 11.15 MCLUHAN — the medium is the message -->
+<section data-screen-label="11.15 McLuhan">
+  <div class="chrome"><div class="row"><span class="tick">// EPIGRAPH</span><span>McLUHAN · 1964</span></div></div>
+  <div class="center-content" style="text-align:center; align-items:center;">
+    <div class="eyebrow" style="text-align:center;">An older voice, same warning</div>
+    <p class="pull" style="font-size:160px; line-height:0.95; margin-top:48px; max-width:1700px; text-align:center; border:none; padding:0;">
+      The medium<br><em>is</em> the message.
+    </p>
+    <p class="attrib" style="margin-top:56px; font-size:28px;">— Marshall McLuhan · <span style="font-style:italic;">Understanding Media</span> · 1964</p>
+    <p class="body" style="margin-top:80px; max-width:1500px; font-size:30px; text-align:center;">
+      The platform you organize on isn't a neutral pipe. <strong>It is the politics.</strong>
+    </p>
+  </div>
+  <div class="sig"><span>11.15 / Epigraph</span><span class="red">the medium is the message</span></div>
+</section>
+
+<!-- 11A. SAME PICTURE — moved up to follow the Doctorow quote -->
+<section data-screen-label="11.2 Same picture">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 03</span><span>SAME PICTURE</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div>
+      <div class="eyebrow">You have seen this movie</div>
+      <h3 style="margin-top:24px;">Same<br>picture.</h3>
+      <ul class="bullets" style="margin-top:24px; font-size:30px;">
+        <li style="font-size:30px; padding:12px 0;"><b>Twitter</b> → X → mass exodus</li>
+        <li style="font-size:30px; padding:12px 0;"><b>Reddit</b> → API rug-pull</li>
+        <li style="font-size:30px; padding:12px 0;"><b>Substack</b> → Nazi problem</li>
+        <li style="font-size:30px; padding:12px 0;"><b>Mailchimp</b> → Intuit doubled prices</li>
+      </ul>
+    </div>
+    <div class="meme-frame right" style="max-width:780px; align-self:center;">
+      <img src="assets/meme-same-picture.png" alt="They're the same picture meme">
+      <div class="cap"><span>file: same-picture</span><span>★ 12</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>11.2 / The pattern</span><span class="red">enshittification curve</span></div>
+</section>
+
+<!-- 11A1. THE LINEUP — tech CEOs at Trump inauguration -->
+<section data-screen-label="11.25 The lineup">
+  <div class="chrome"><div class="row"><span class="tick">// EVIDENCE</span><span>JAN 20 · 2025</span></div></div>
+  <div style="display:grid; grid-template-columns: 1.05fr 1fr; gap:56px; flex:1; align-items:center;">
+    <div>
+      <div class="eyebrow">Front row at the inauguration</div>
+      <h2 style="margin-top:18px; margin-bottom:28px; font-size:104px; line-height:0.95;">Not a metaphor.<br>A <em>group photo.</em></h2>
+      <p class="body lg" style="max-width:900px;">
+        Zuckerberg. Bezos. Pichai. Musk. Standing shoulder-to-shoulder at the swearing-in of a president who ran on mass deportation, press intimidation, and rolling back civil rights.
+      </p>
+      <p class="body" style="margin-top:24px; font-size:30px; max-width:900px;">
+        These are the people who own the rails your campaign runs on.
+        <strong>They picked a side.</strong> The question is whether you keep paying them rent.
+      </p>
+      <div style="margin-top:36px; display:flex; gap:14px; flex-wrap:wrap; font-family:var(--mono); font-size:22px;">
+        <span style="border:1px solid var(--rule); padding:8px 14px;">META</span>
+        <span style="border:1px solid var(--rule); padding:8px 14px;">AMAZON</span>
+        <span style="border:1px solid var(--rule); padding:8px 14px;">GOOGLE</span>
+        <span style="border:1px solid var(--rule); padding:8px 14px;">X / TESLA</span>
+      </div>
+    </div>
+    <div style="border:2px solid var(--rule); padding:14px; background:#0a0c10;">
+      <img src="assets/tech-ceos-inauguration.png" alt="Mark Zuckerberg, Lauren Sanchez, Jeff Bezos, Sundar Pichai, and Elon Musk standing together at the January 2025 US presidential inauguration" style="display:block; width:100%; height:auto;">
+      <div style="display:flex; justify-content:space-between; margin-top:14px; font-family:var(--mono); font-size:20px; color:var(--dim);">
+        <span>file: tech-ceos-inauguration</span>
+        <span class="red">★ 11.25</span>
+      </div>
+    </div>
+  </div>
+  <div class="sig"><span>11.25 / The lineup</span><span class="red">they picked a side</span></div>
+</section>
+
+<!-- 11A2. PRIME EVIL — META -->
+<section data-screen-label="11.3 Prime evil — Meta">
+  <div class="chrome"><div class="row"><span class="tick">// PRIME EVIL</span><span>META · DOSSIER</span></div></div>
+  <div class="eyebrow">And one platform belongs in its own category</div>
+  <h2 style="margin-top:18px; margin-bottom:28px; font-size:104px; line-height:0.95;">Prime evil:<br><em>Meta.</em></h2>
+  <div style="display:grid; grid-template-columns: 1.05fr 1fr 1fr; gap:32px; flex:1; align-items:start;">
+    <div style="border:2px solid var(--rule); padding:24px; background:var(--ink-2);">
+      <div class="kicker red">COUNT 01 — GENOCIDE</div>
+      <p class="body" style="font-size:28px; margin-top:14px;">Amnesty International found Facebook's algorithms <em>amplified</em> hate against the Rohingya in the run-up to the 2017 massacre in Myanmar.</p>
+      <div style="font-family:var(--mono); font-size:20px; color:var(--dim); margin-top:18px; border-top:1px solid var(--rule); padding-top:12px;">src · pbs.org/newshour · sept 2022</div>
+    </div>
+    <div style="border:2px solid var(--rule); padding:24px; background:var(--ink-2);">
+      <div class="kicker red">COUNT 02 — ADDICTIVE BY DESIGN</div>
+      <p class="body" style="font-size:28px; margin-top:14px;">A US federal judge ruled Instagram and Facebook can be deemed <em>addictive products</em> — children's claims against Meta will go to trial.</p>
+      <div style="font-family:var(--mono); font-size:20px; color:var(--dim); margin-top:18px; border-top:1px solid var(--rule); padding-top:12px;">src · multi-district litigation · 2024–25</div>
+    </div>
+    <div style="border:2px solid var(--rule); padding:24px; background:var(--ink-2);">
+      <div class="kicker red">COUNT 03 — CHILD TRAFFICKING</div>
+      <p class="body" style="font-size:28px; margin-top:14px;">Meta's platforms are the <em>#1</em> reported venue for the online trafficking and grooming of children — internal docs and NCMEC reports both say so.</p>
+      <div style="font-family:var(--mono); font-size:20px; color:var(--dim); margin-top:18px; border-top:1px solid var(--rule); padding-top:12px;">src · NM AG complaint · NCMEC CyberTipline</div>
+    </div>
+  </div>
+  <p class="body" style="margin-top:28px; max-width:1750px; font-size:30px;">
+    This is the company we hand our movements, our member lists, our event RSVPs, and our kids to.
+    <strong>Every Facebook group is a hostage situation.</strong>
+  </p>
+  <div class="sig"><span>11.3 / Prime evil</span><span class="red">Meta · genocide · addiction · trafficking</span></div>
+</section>
+
+<!-- 11B. SOCIAL MEDIA INDICTMENT -->
+<section data-screen-label="11.5 Social media indictment">
+  <div class="chrome"><div class="row"><span class="tick">// THE PRODUCT</span><span>YOU</span></div></div>
+  <div class="center-content">
+    <div class="eyebrow">A side note worth saying out loud</div>
+    <h2 style="margin-top:24px; margin-bottom:48px; font-size:108px;">The platforms we organize on<br>are <em>damaging.</em></h2>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:32px; max-width:1700px;">
+      <div style="border-top:3px solid var(--red); padding-top:18px;">
+        <div class="kicker red">01</div>
+        <p class="body" style="font-size:30px; margin-top:8px;">Addictive by design. <strong>Bad for kids.</strong></p>
+      </div>
+      <div style="border-top:3px solid var(--red); padding-top:18px;">
+        <div class="kicker red">02</div>
+        <p class="body" style="font-size:30px; margin-top:8px;"><strong>Corrosive</strong> to social fabric.</p>
+      </div>
+      <div style="border-top:3px solid var(--red); padding-top:18px;">
+        <div class="kicker red">03</div>
+        <p class="body" style="font-size:30px; margin-top:8px;">If you're a left-leaning organizer using American products — <strong>you are a target.</strong></p>
+      </div>
+    </div>
+    <p class="body lg" style="margin-top:56px; max-width:1700px;">
+      Not theoretical. <em>Already happening.</em> Let me show you what one small Alberta non-profit's server logs look like.
+    </p>
+  </div>
+  <div class="sig"><span>11.5 / Side note</span><span class="red">the product is you</span></div>
+</section>
+
+<!-- 11C. THE ATTACK SURFACE -->
+<section data-screen-label="11.6 Attack surface">
+  <div class="chrome"><div class="row"><span class="tick">// LOGS</span><span>n3-pia · 30 DAYS</span></div></div>
+  <div class="eyebrow">PIA's server, last 30 days</div>
+  <h2 style="margin-top:24px; margin-bottom:32px; font-size:96px;">Someone is <em>already</em> at the door.</h2>
+  <div style="display:grid; grid-template-columns: 1.1fr 1fr 1fr; gap:32px; flex:1; align-items:start;">
+    <div style="border:2px solid var(--rule); padding:24px; background:var(--ink-2);">
+      <div class="kicker red">FIG. 02 — REQUESTS</div>
+      <img src="assets/web-traffic-30d.png" alt="Cloudflare web traffic dashboard showing 5.33M requests over 30 days" style="display:block; width:100%; height:auto; margin-top:14px;">
+      <div style="display:flex; justify-content:space-between; margin-top:14px; font-family:var(--mono); font-size:24px;">
+        <span class="dim">total / 30d</span><span class="red"><b>5.33M</b></span>
+      </div>
+    </div>
+    <div style="border:2px solid var(--rule); padding:24px; background:var(--ink-2);">
+      <div class="kicker red">FIG. 03 — THREATS BY COUNTRY</div>
+      <img src="assets/threats-by-country.png" alt="World map showing threat origin: United States, by an order of magnitude" style="display:block; width:100%; height:auto; margin-top:14px;">
+      <div style="display:flex; justify-content:space-between; margin-top:14px; font-family:var(--mono); font-size:24px;">
+        <span class="dim">origin · #1</span><span class="red"><b>UNITED STATES</b></span>
+      </div>
+    </div>
+    <div style="border:2px solid var(--rule); padding:24px; background:var(--ink-2);">
+      <div class="kicker red">FIG. 04 — A TYPICAL SPIKE</div>
+      <img src="assets/threats-spike.png" alt="Threats chart spiking to 2,790 in a single day" style="display:block; width:100%; height:auto; margin-top:14px;">
+      <div style="display:flex; justify-content:space-between; margin-top:14px; font-family:var(--mono); font-size:24px;">
+        <span class="dim">peak · single day</span><span class="red"><b>2,790</b></span>
+      </div>
+    </div>
+  </div>
+  <p class="body" style="margin-top:32px; max-width:1700px; font-size:30px;">
+    Several <em>hundred thousand</em> probe requests a day. Most days. Almost all from US-origin IPs.
+    This is one small Alberta non-profit. <strong>They are playing offense already.</strong>
+  </p>
+  <div class="sig"><span>11.6 / Receipts</span><span class="red">5.33M requests · #1 origin USA</span></div>
+</section>
+
+<!-- 11D. THREAT ACTORS - takeover behavior -->
+<section data-screen-label="11.7 Threat actors">
+  <div class="chrome"><div class="row"><span class="tick">// ACTORS</span><span>SAMPLE OF TWO</span></div></div>
+  <div class="eyebrow">A sample, picked at random</div>
+  <h2 style="margin-top:24px; margin-bottom:32px; font-size:84px;">Account takeovers,<br>posing as <em>consultants.</em></h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px; flex:1; align-items:start;">
+    <div>
+      <div style="border:2px solid var(--rule); padding:14px; background:#0a0c10;">
+        <img src="assets/threat-actor-betsey.png" alt="Compromised Gitea account: Betsey Monte / betseymonte722, posing as Lightray Solutions consulting firm" style="display:block; width:100%; height:auto;">
+      </div>
+      <div style="margin-top:16px; font-family:var(--mono); font-size:24px;">
+        <div class="red"><b>"Betsey Monte"</b></div>
+        <div class="dim">joined dec 6 · 0 followers · "Power BI consulting"</div>
+      </div>
+    </div>
+    <div>
+      <div style="border:2px solid var(--rule); padding:14px; background:#0a0c10;">
+        <img src="assets/threat-actor-waylon.png" alt="Compromised Gitea account: Waylon Grassi / terrapulver051, profile in Russian" style="display:block; width:100%; height:auto;">
+      </div>
+      <div style="margin-top:16px; font-family:var(--mono); font-size:24px;">
+        <div class="red"><b>"Waylon Grassi"</b></div>
+        <div class="dim">joined dec 1 · 0 followers · profile in Russian</div>
+      </div>
+    </div>
+  </div>
+  <p class="body" style="margin-top:32px; max-width:1700px; font-size:28px;">
+    These accounts try to register, push junk repos, and use a small org's domain reputation as cover.
+    Not theoretical. <em>Logged this month.</em>
+  </p>
+  <div class="sig"><span>11.7 / Actors</span><span class="red">your members' data is in the blast radius</span></div>
+</section>
+
+<!-- 13+14 COMBINED. TENANT — meme + receipt -->
+<section data-screen-label="13 You are the tenant">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 04 + RECEIPT</span><span>AAAAND IT'S GONE · MAILCHIMP</span></div></div>
+  <div style="display:grid; grid-template-columns: 0.95fr 0.85fr 1.1fr; gap:40px; flex:1; align-items:center;">
+    <div class="meme-frame" style="margin:0;">
+      <img src="assets/meme-and-its-gone.png" alt="Aaaand it's gone — exporting subscriber list">
+      <div class="cap"><span>file: subscriber-list</span><span>★ 13</span></div>
+    </div>
+    <div>
+      <div class="eyebrow">What you're actually renting</div>
+      <h3 style="margin-top:18px; font-size:84px; line-height:0.95;">It's not<br>yours.</h3>
+      <p class="body" style="margin-top:24px; font-size:28px;">You're a <em>tenant.</em> They're the landlord. The rent goes up.</p>
+      <p class="kicker red" style="margin-top:28px;">You. Are. The. Tenant.</p>
+    </div>
+    <div class="receipt">
+      <h4 style="font-size:24px;"><span>RENT — MAILCHIMP</span><span>★★★</span></h4>
+      <div class="line"><b>Subscriber list</b><span>technically exportable</span></div>
+      <div class="line"><b>Sending reputation</b><span>theirs.</span></div>
+      <div class="line"><b>Members' privacy</b><span>sold.</span></div>
+      <div class="line"><b>Templates</b><span>sunset → start over.</span></div>
+      <div class="line"><b>Next year's price</b><span>they tell you in december.</span></div>
+      <div class="total"><span>YOU OWN</span><span>$0.00</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>13 / Tenants</span><span class="red">the rent goes up</span></div>
+</section>
+
+<!-- 15. CHANGE MY MIND -->
+<section data-screen-label="15 Change my mind">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 05</span><span>CHANGE MY MIND</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div>
+      <div class="eyebrow">WHAT IS FREE &amp; OPEN SOURCE SOFTWARE</div>
+      <h3 style="margin-top:24px;">Software<br>anyone can use, share,<br>modify, and redistribute<br>&mdash; source code and all.</h3>
+      <p class="body" style="margin-top:32px;">
+        You run it. You study it. You share it. You improve it.
+      </p>
+      <p class="kicker red" style="margin-top:24px;">No license expiry. No price hike. No deplatforming.</p>
+    </div>
+    <div class="meme-frame right">
+      <img src="assets/meme-change-my-mind.png" alt="Change my mind — FOSS is the only honest answer">
+      <div class="cap"><span>file: change-my-mind</span><span>★ 15</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>15 / FOSS</span><span class="red">change my mind</span></div>
+</section>
+
+<!-- 16. FOUR FREEDOMS -->
+<section data-screen-label="16 Four freedoms">
+  <div class="chrome"><div class="row"><span class="tick">// CANON</span><span>FSF · SINCE 1986</span></div></div>
+  <div class="eyebrow">THE FOUR FREEDOMS</div>
+  <h2 style="margin-top:24px; margin-bottom:64px;">1 → 4</h2>
+  <div class="grid-2" style="gap:48px;">
+    <div>
+      <div style="display:flex; gap:32px; align-items:baseline;">
+        <span class="bigstat" style="font-size:160px;">1</span>
+        <div>
+          <h3 style="font-size:64px;">Run.</h3>
+          <p class="body" style="margin-top:8px;">The program, for any purpose.</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:32px; align-items:baseline; margin-top:48px;">
+        <span class="bigstat" style="font-size:160px;">2</span>
+        <div>
+          <h3 style="font-size:64px;">Study.</h3>
+          <p class="body" style="margin-top:8px;">How it works. Modify it.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex; gap:32px; align-items:baseline;">
+        <span class="bigstat" style="font-size:160px;">3</span>
+        <div>
+          <h3 style="font-size:64px;">Share.</h3>
+          <p class="body" style="margin-top:8px;">Copies with your neighbours.</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:32px; align-items:baseline; margin-top:48px;">
+        <span class="bigstat" style="font-size:160px;">4</span>
+        <div>
+          <h3 style="font-size:64px;">Improve.</h3>
+          <p class="body" style="margin-top:8px;">Share your improvements.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sig"><span>16 / Four Freedoms</span><span class="red">— Free Software Foundation, 1986</span></div>
+</section>
+
+<!-- 17. GOVERNMENTS -->
+<section data-screen-label="17 Governments">
+  <div class="chrome"><div class="row"><span class="tick">// PRECEDENT</span><span>GOVERNMENTS</span></div></div>
+  <div class="eyebrow">Governments are doing this</div>
+  <h2 style="margin-top:24px; margin-bottom:48px;">Public money,<br><em>public code.</em></h2>
+  <div class="flags">
+    <div class="flag"><span class="em">🇩🇪</span><div><b>Munich</b><span>15,000 workstations on Linux</span></div></div>
+    <div class="flag"><span class="em">🇪🇸</span><div><b>Barcelona</b><span>open-source-first procurement</span></div></div>
+    <div class="flag"><span class="em">🇩🇪</span><div><b>Schleswig-Holstein</b><span>30,000 PCs migrating off Microsoft</span></div></div>
+    <div class="flag"><span class="em">🇪🇺</span><div><b>European Union</b><span>Public Money, Public Code</span></div></div>
+  </div>
+  <div class="sig"><span>17 / Precedent</span><span class="red">it works at scale</span></div>
+</section>
+
+<!-- 18. CANADIAN ANGLE -->
+<section data-screen-label="18 Canadian angle">
+  <div class="chrome"><div class="row"><span class="tick">// CANADA</span><span>WE'RE HERE</span></div></div>
+  <div class="eyebrow">The Canadian angle</div>
+  <h2 style="margin-top:24px; margin-bottom:48px;">It's already here.</h2>
+  <ul class="bullets" style="max-width:1700px;">
+    <li><b>CIRA</b> — funds Canadian civic tech (and yes, you can apply)</li>
+    <li><b>Open North</b> — runs the API for every Canadian elected official</li>
+    <li><b>The Tyee · Press Progress</b> — independent media, FOSS-leaning stacks</li>
+    <li><b>Us</b> — yes, hi 👋</li>
+  </ul>
+  <div class="sig"><span>18 / Canada</span><span class="red">cira.ca · opennorth.ca</span></div>
+</section>
+
+<!-- 19. GALAXY BRAIN -->
+<section data-screen-label="19 Galaxy brain">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 06</span><span>GALAXY BRAIN</span></div></div>
+  <div class="meme-slide" style="flex:1; grid-template-columns: 0.8fr 1.3fr; align-items:start;">
+    <div class="meme-frame" style="max-width:560px;">
+      <img src="assets/meme-galaxy-brain.png" alt="Expanding brain — paying mailchimp vs self-hosting">
+      <div class="cap"><span>file: galaxy-brain</span><span>★ 19</span></div>
+    </div>
+    <div>
+      <div class="eyebrow">Translated to your work</div>
+      <h3 style="margin-top:24px; margin-bottom:32px;">Stop paying<br>for sadness.</h3>
+      <table class="tools-tbl">
+        <thead><tr><th>Stop</th><th>Run</th><th>Replaces</th></tr></thead>
+        <tbody>
+          <tr><td>Mailchimp</td><td>Listmonk</td><td>Intuit's bill</td></tr>
+          <tr><td>Eventbrite</td><td>Mobilizon</td><td>Per-ticket fees</td></tr>
+          <tr><td>Google Workspace</td><td>Nextcloud</td><td>The surveillance bill</td></tr>
+          <tr><td>Slack</td><td>Mattermost</td><td>$7.25 / seat / mo</td></tr>
+          <tr><td>SurveyMonkey</td><td>LimeSurvey</td><td>Per-response throttles</td></tr>
+          <tr><td>Salesforce</td><td>CiviCRM</td><td>The Salesforce tax</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="sig"><span>19 / Translation</span><span class="red">$0 license cost</span></div>
+</section>
+
+<!-- 20. DISTRACTED BOYFRIEND -->
+<section data-screen-label="20 Distracted boyfriend">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 07</span><span>DISTRACTED BUDGET</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div>
+      <div class="eyebrow">What it costs you</div>
+      <h3 style="margin-top:24px;">Your budget,<br>looking around.</h3>
+      <p class="body" style="margin-top:32px;">One year of Mailchimp pays for <em>ten years</em> of Listmonk on used hardware.</p>
+      <p class="body" style="margin-top:24px;">Investing in learning today saves <em>hundreds of thousands</em> over your movement's lifetime — and keeps you <em>safer</em>.</p>
+    </div>
+    <div class="meme-frame right">
+      <img src="assets/meme-distracted-boyfriend.png" alt="Distracted boyfriend — campaign budget eyeing Listmonk">
+      <div class="cap"><span>file: distracted-boyfriend</span><span>★ 20</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>20 / Cost shape</span><span class="red">5 yrs Mailchimp = 10 yrs Listmonk</span></div>
+</section>
+
+<!-- 21. COST COMPARE -->
+<section data-screen-label="21 Cost compare">
+  <div class="chrome"><div class="row"><span class="tick">// MATH</span><span>YEAR 1 → YEAR 5</span></div></div>
+  <div class="eyebrow">Bring receipts</div>
+  <h2 style="margin-top:24px; margin-bottom:48px;">Do the math.</h2>
+  <div class="compare">
+    <div class="col">
+      <h4>Option A — pay rent</h4>
+      <div class="name">Mailchimp.</div>
+      <div class="row"><span>Software</span><b>$300/mo → $3,600/yr</b></div>
+      <div class="row"><span>Plus</span><b>algorithmic burial</b></div>
+      <div class="row"><span>Plus</span><b>their politics</b></div>
+      <div class="row"><span>Year 1</span><b>$3,600</b></div>
+      <div class="total"><span>5-YR TOTAL</span><b>$20,000+</b></div>
+    </div>
+    <div class="col win">
+      <h4>Option B — own the deed</h4>
+      <div class="name">Listmonk.</div>
+      <div class="row"><span>Software</span><b>$0</b></div>
+      <div class="row"><span>SMTP relay</span><b>~$10/mo</b></div>
+      <div class="row"><span>Plus</span><b>a few hours / mo</b></div>
+      <div class="row"><span>Year 1</span><b>$120</b></div>
+      <div class="total"><span>5-YR TOTAL</span><b>~$600</b></div>
+    </div>
+  </div>
+  <div class="sig"><span>21 / Math</span><span class="red">$19,400 saved</span></div>
+</section>
+
+<!-- 22. SPIDERMAN -->
+<section data-screen-label="22 Spiderman maintenance">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 08</span><span>WHO MAINTAINS IT</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div>
+      <div class="eyebrow">"But who maintains it?"</div>
+      <h3 style="margin-top:24px;">Someone<br>always does.</h3>
+      <p class="body" style="margin-top:32px;">
+        <strong>Honest answer:</strong> staff time, or a contract.
+      </p>
+      <p class="body" style="margin-top:20px;">
+        <strong>Dishonest answer:</strong> <em>Mailchimp.</em> They hide it in your bill — and extract their margin from your members' data on the way through.
+      </p>
+    </div>
+    <div class="meme-frame right">
+      <img src="assets/meme-spiderman-pointing.png" alt="Spider-man pointing at himself">
+      <div class="cap"><span>file: spiderman-pointing</span><span>★ 22</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>22 / Maintenance</span><span class="red">there is no free lunch — only honest receipts</span></div>
+</section>
+
+<!-- 23. THESIS -->
+<section data-screen-label="23 Thesis — distributed">
+  <div class="chrome"><div class="row"><span class="tick">// THESIS</span><span>DISTRIBUTED</span></div></div>
+  <div class="dist-diagram" style="flex:1; grid-template-columns: 1.1fr 1fr;">
+    <div>
+      <div class="eyebrow">The thesis</div>
+      <h3 style="margin-top:24px; font-size:72px; line-height:1;">A thousand<br>neighbourhood<br>lists.</h3>
+      <p class="body" style="margin-top:32px;">
+        <em>Will out-organize</em> any single national list.
+      </p>
+      <p class="kicker" style="margin-top:32px;">Less leaders. More doers.<br>Distribute the tools. Distribute the campaign.</p>
+    </div>
+    <div>
+      <svg class="diagram-svg" viewBox="0 0 700 600" fill="none" stroke="currentColor">
+        <!-- centralized -->
+        <g transform="translate(0,0)">
+          <text x="20" y="30" font-family="JetBrains Mono" font-size="24" fill="#8a8f99" stroke="none">CENTRALIZED</text>
+          <circle cx="160" cy="160" r="36" fill="#e63946" stroke="none"/>
+          <g stroke="#2a2d33" stroke-width="2">
+            <line x1="160" y1="160" x2="50" y2="60"/>
+            <line x1="160" y1="160" x2="280" y2="50"/>
+            <line x1="160" y1="160" x2="40" y2="220"/>
+            <line x1="160" y1="160" x2="290" y2="220"/>
+            <line x1="160" y1="160" x2="60" y2="290"/>
+            <line x1="160" y1="160" x2="270" y2="290"/>
+          </g>
+          <g fill="#8a8f99" stroke="none">
+            <circle cx="50" cy="60" r="10"/>
+            <circle cx="280" cy="50" r="10"/>
+            <circle cx="40" cy="220" r="10"/>
+            <circle cx="290" cy="220" r="10"/>
+            <circle cx="60" cy="290" r="10"/>
+            <circle cx="270" cy="290" r="10"/>
+          </g>
+        </g>
+        <!-- distributed -->
+        <g transform="translate(370,0)">
+          <text x="20" y="30" font-family="JetBrains Mono" font-size="24" fill="#e63946" stroke="none">DISTRIBUTED</text>
+          <g stroke="#e63946" stroke-width="2" stroke-opacity="0.5">
+            <line x1="80" y1="80" x2="160" y2="60"/>
+            <line x1="160" y1="60" x2="240" y2="100"/>
+            <line x1="80" y1="80" x2="100" y2="170"/>
+            <line x1="100" y1="170" x2="200" y2="180"/>
+            <line x1="200" y1="180" x2="240" y2="100"/>
+            <line x1="100" y1="170" x2="60" y2="260"/>
+            <line x1="60" y1="260" x2="180" y2="270"/>
+            <line x1="180" y1="270" x2="200" y2="180"/>
+            <line x1="180" y1="270" x2="270" y2="240"/>
+            <line x1="240" y1="100" x2="270" y2="240"/>
+          </g>
+          <g fill="#e63946" stroke="none">
+            <circle cx="80" cy="80" r="14"/>
+            <circle cx="160" cy="60" r="14"/>
+            <circle cx="240" cy="100" r="14"/>
+            <circle cx="100" cy="170" r="14"/>
+            <circle cx="200" cy="180" r="14"/>
+            <circle cx="60" cy="260" r="14"/>
+            <circle cx="180" cy="270" r="14"/>
+            <circle cx="270" cy="240" r="14"/>
+          </g>
+        </g>
+        <!-- bottom labels -->
+        <text x="60" y="380" font-family="JetBrains Mono" font-size="24" fill="#8a8f99" stroke="none">one list · one bill</text>
+        <text x="370" y="380" font-family="JetBrains Mono" font-size="24" fill="#e63946" stroke="none">a thousand neighbours</text>
+      </svg>
+    </div>
+  </div>
+  <div class="sig"><span>23 / The thesis</span><span class="red">distribute everything</span></div>
+</section>
+
+<!-- 24. BUNKER THESIS — $149.99 -->
+<section data-screen-label="24 Bunker thesis">
+  <div class="chrome"><div class="row"><span class="tick">// SERVER</span><span>USED LENOVO</span></div></div>
+  <div class="grid-2" style="flex:1;">
+    <div>
+      <div class="eyebrow">The Bunker thesis</div>
+      <h3 style="margin-top:24px;">Grassroots<br>orgs should<br>not be funding<br>their own<br>surveillance.</h3>
+      <p class="kicker" style="margin-top:32px;">Sovereign infra is here. It's cheap. It works.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center;">
+      <div class="kicker" style="margin-bottom:8px;">PIA's server, right now</div>
+      <div class="bigstat">$149<span class="unit">.99</span></div>
+      <p class="body" style="margin-top:32px; max-width:600px;">7-yr-old <strong>Lenovo ThinkCentre</strong> from a shop on 124 Street.</p>
+      <div class="kicker red" style="margin-top:32px;">It is hosting this site.<br>It is hosting this <em>presentation.</em></div>
+    </div>
+  </div>
+  <div class="sig"><span>24 / Sovereign</span><span class="red">a refurb shop on 124 Street</span></div>
+</section>
+
+<!-- 25. SECTION DIVIDER: LIVE TOUR -->
+<section data-screen-label="25 § Live tour" class="section-divider">
+  <div style="padding:80px 100px; width:100%;">
+    <div class="num">PART · 02</div>
+    <h1 style="margin-top:40px;">LIVE<br>TOUR.</h1>
+    <div class="sub">The PIA server, in the wild — 10 minutes</div>
+  </div>
+  <div class="marks">
+    <span>22 — 32</span>
+    <span>★ ★ ★</span>
+    <span>SSH · TERMINAL · DOCS</span>
+  </div>
+</section>
+
+<!-- 26. WHAT YOU JUST SAW -->
+<section data-screen-label="26 What you saw">
+  <div class="chrome"><div class="row"><span class="tick">// SPECS</span><span>n3-pia</span></div></div>
+  <div class="eyebrow">What you just saw</div>
+  <h2 style="margin-top:24px; margin-bottom:48px;">The whole stack.</h2>
+  <ul class="bullets" style="max-width:1700px;">
+    <li>7-year-old <b>Lenovo ThinkCentre</b>, $149.99</li>
+    <li><b>Ubuntu Server</b> · <b>Docker</b> · <b>Gitea</b> · <b>Pangolin</b> · <b>MkDocs</b> · <b>Listmonk</b></li>
+    <li>Hosting <b>PIA's web presence</b> right now</li>
+    <li>Documented top-to-bottom in a <b>markdown vault</b> you could fork</li>
+  </ul>
+  <div class="sig"><span>26 / Stack</span><span class="red">all free</span></div>
+</section>
+
+<!-- 27. BUILD TEACH DISTRIBUTE -->
+<section data-screen-label="27 Build · Teach · Distribute" class="dot-bg">
+  <div class="chrome"><div class="row"><span class="tick">// METHOD</span><span>BNKOPS DOCTRINE</span></div></div>
+  <div class="center-content">
+    <div class="eyebrow">What we do, every time</div>
+    <h2 style="font-size:180px; margin-top:32px;">
+      Build·<br>Teach·<br><em>Distribute.</em>
+    </h2>
+    <div style="margin-top:48px; max-width:1600px; display:flex; flex-direction:column; gap:18px;">
+      <p class="body lg">The tools we use, <strong>we show you.</strong></p>
+      <p class="body lg">The stack we run, <strong>we share.</strong></p>
+      <p class="body lg">The code, <strong>we hand over.</strong></p>
+    </div>
+  </div>
+  <div class="sig"><span>27 / Method</span><span class="red">no proprietary moats</span></div>
+</section>
+
+<!-- 28. SECTION DIVIDER: NOW YOU -->
+<section data-screen-label="28 § Now you" class="section-divider">
+  <div style="padding:80px 100px; width:100%;">
+    <div class="num">PART · 03</div>
+    <h1 style="margin-top:40px;">NOW<br>YOU.</h1>
+    <div class="sub">You design the build — 18 minutes</div>
+  </div>
+  <div class="marks">
+    <span>32 — 50</span>
+    <span>★ ★ ★</span>
+    <span>GROUPS OF 4</span>
+  </div>
+</section>
+
+<!-- 29. THE HANDOUT -->
+<section data-screen-label="29 The handout">
+  <div class="chrome"><div class="row"><span class="tick">// TAKE HOME</span><span>HANDOUT</span></div></div>
+  <div class="grid-2" style="flex:1;">
+    <div style="position:relative;">
+      <div class="eyebrow">The handout</div>
+      <h3 style="margin-top:24px;">Every tool.<br>Every link.</h3>
+      <p class="body" style="margin-top:32px;">Hosted on <strong>PIA's own server</strong> — running on the stack you're about to design.</p>
+      <p class="body" style="margin-top:16px;">Take it home. Fork it.</p>
+      <div class="url-plate" style="margin-top:48px;">https://pia2026.publicinterestalberta.org/</div>
+      <p class="kicker red" style="margin-top:18px; font-size:22px;">// technically: I clickjacked the domain. it's fine. it's FOSS.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:32px; position:relative;">
+      <div class="qr" style="width:420px; height:420px;"></div>
+      <div style="position:relative; transform: rotate(-4deg); border:3px solid var(--red); padding:8px; background:#0a0c10; box-shadow: 0 12px 40px rgba(0,0,0,0.5);">
+        <img src="assets/meme-mine-now.gif" alt="Monkey stealing a hubcap — 'mine now' meme" style="display:block; width:340px; height:auto;">
+        <div style="position:absolute; top:-18px; left:-18px; background:var(--red); color:#fff; font-family:var(--mono); font-size:18px; padding:6px 12px; letter-spacing:0.08em;">MINE NOW</div>
+      </div>
+    </div>
+  </div>
+  <div class="sig"><span>29 / Handout</span><span class="red">scan from your seat</span></div>
+</section>
+
+<!-- 31. PAD -->
+<section data-screen-label="31 The pad">
+  <div class="chrome"><div class="row"><span class="tick">// PAD</span><span>CRYPTPAD</span></div></div>
+  <div class="center-content">
+    <div class="eyebrow">Where we'll write</div>
+    <p class="body lg" style="margin-top:24px;">Open it in your browser. Add your group's section.</p>
+    <pre style="margin:32px auto 0; max-width:1100px; padding:24px 32px; border:2px solid var(--rule); background:var(--ink-2); font-family:var(--mono); font-size:28px; line-height:1.5; color:var(--ink-text); text-align:left; white-space:pre;">---
+[Insert Group Name]
+Write your content
+---</pre>
+    <p class="body lg" style="margin-top:32px;">That's your spot.</p>
+    <div class="url-plate" style="font-size:84px; margin-top:48px;">
+      <span class="scheme">https://</span>pad.publicinterestalberta.org
+    </div>
+    <p class="kicker" style="margin-top:48px;">QR on your table.</p>
+  </div>
+  <div class="sig"><span>31 / Pad</span><span class="red">no signups</span></div>
+</section>
+
+<!-- 32. ROLL SAFE -->
+<section data-screen-label="32 The task">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 09</span><span>YOUR TASK</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div>
+      <div class="eyebrow">Your task · groups of 4</div>
+      <h3 style="margin-top:24px; margin-bottom:32px;">25 minutes.</h3>
+      <ol class="bullets" style="counter-reset:item; list-style:none;">
+        <li style="font-size:34px;"><b style="font-size:34px;">1.</b> Pick <em>one</em> corporate tool your org pays for</li>
+        <li style="font-size:34px;"><b style="font-size:34px;">2.</b> Find <em>two</em> FOSS alternatives</li>
+        <li style="font-size:34px;"><b style="font-size:34px;">3.</b> Write a <em>200-word</em> writeup in the pad</li>
+      </ol>
+      <p class="kicker" style="margin-top:32px;">Use the handout. Use the web. Talk to your group.</p>
+    </div>
+    <div class="meme-frame right">
+      <img src="assets/meme-roll-safe.png" alt="Roll safe — can't lose 25 minutes drafting if pad is open">
+      <div class="cap"><span>file: roll-safe</span><span>★ 32</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>32 / Task</span><span class="red">25 min · groups of 4</span></div>
+</section>
+
+<!-- 33. WATCH THIS — operator station -->
+<section data-screen-label="33 Watch this">
+  <div class="chrome"><div class="row"><span class="tick">// OPERATOR</span><span>LIVE</span></div></div>
+  <div class="center-content" style="justify-content:center;">
+    <div class="eyebrow">Watch this</div>
+    <h2 style="margin-top:32px; margin-bottom:48px;">Three windows.<br><em>One room.</em></h2>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:32px; max-width:1700px;">
+      <div style="border:2px solid var(--rule); padding:32px; background:var(--ink-2);">
+        <div class="kicker red">01</div>
+        <h3 style="font-size:42px; margin-top:8px;">The pad.</h3>
+        <p class="body" style="font-size:24px; margin-top:12px;">Where you write.</p>
+      </div>
+      <div style="border:2px solid var(--rule); padding:32px; background:var(--ink-2);">
+        <div class="kicker red">02</div>
+        <h3 style="font-size:42px; margin-top:8px;">The docs/.</h3>
+        <p class="body" style="font-size:24px; margin-top:12px;">Where we draft</p>
+      </div>
+      <div style="border:2px solid var(--rule); padding:32px; background:var(--ink-2);">
+        <div class="kicker red">03</div>
+        <h3 style="font-size:42px; margin-top:8px;">The site.</h3>
+        <p class="body" style="font-size:24px; margin-top:12px;">Where it lands.</p>
+      </div>
+    </div>
+  </div>
+  <div class="sig"><span>33 / Operator</span><span class="red">SSH · projector · public URL</span></div>
+</section>
+
+<!-- 34. SECTION DIVIDER: DEPLOY -->
+<section data-screen-label="34 § Deploy" class="section-divider">
+  <div style="padding:80px 100px; width:100%;">
+    <div class="num">PART · 04</div>
+    <h1 style="margin-top:40px;">DEPLOY.</h1>
+    <div class="sub">We deploy it, live — 17 minutes</div>
+  </div>
+  <div class="marks">
+    <span>55 — 72</span>
+    <span>★ ★ ★</span>
+    <span>git pull · serve · refresh</span>
+  </div>
+</section>
+
+<!-- 35. SUCCESS KID -->
+<section data-screen-label="35 Success kid">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 10</span><span>YOU SHIPPED IT</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div class="meme-frame">
+      <img src="assets/meme-success-kid.png" alt="Success kid — built a public website in 80 minutes">
+      <div class="cap"><span>file: success-kid</span><span>★ 35</span></div>
+    </div>
+    <div>
+      <div class="eyebrow">The site you just built</div>
+      <h3 style="margin-top:24px;">It's live.<br>It's <em>yours.</em></h3>
+      <div class="url-plate sm" style="margin-top:32px;"><span class="scheme">https://</span>pia2026.publicinterestalberta.org</div>
+      <p class="body" style="margin-top:24px;">The room wrote everything on it. It stays up. <strong>Send your team the URL.</strong></p>
+    </div>
+  </div>
+  <div class="sig"><span>35 / Live</span><span class="red">screenshot it · send it</span></div>
+</section>
+
+<!-- 36. WONKA + OPRAH "you get a starter stack" -->
+<section data-screen-label="36 Starter stack — Oprah">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 11</span><span>EVERYBODY</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div>
+      <div class="eyebrow">And here is the repo</div>
+      <h3 style="margin-top:24px;">Take it.<br>Run it.<br><em>Fork it.</em></h3>
+      <div class="url-plate sm" style="margin-top:32px; font-size:28px;">github.com/adminatthebunker/PIA-BNKOP-SERVER</div>
+      <p class="body" style="margin-top:24px;">Everything you just saw runs from this. Your org has the same stack tomorrow.</p>
+    </div>
+    <div class="meme-frame right">
+      <img src="assets/meme-oprah.png" alt="Oprah — you get a starter stack">
+      <div class="cap"><span>file: oprah-starter-stack</span><span>★ 36</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>36 / Repo</span><span class="red">git clone · enjoy</span></div>
+</section>
+
+<!-- 37. SECTION DIVIDER: WHERE TO -->
+<section data-screen-label="37 § Where to from here" class="section-divider">
+  <div style="padding:80px 100px; width:100%;">
+    <div class="num">PART · 05</div>
+    <h1 style="margin-top:40px;">WHERE<br>TO.</h1>
+    <div class="sub">From here — 8 minutes</div>
+  </div>
+  <div class="marks">
+    <span>72 — 80</span>
+    <span>★ ★ ★</span>
+    <span>THE ASK</span>
+  </div>
+</section>
+
+<!-- 38. CMlite -->
+<section data-screen-label="38 CMlite">
+  <div class="chrome"><div class="row"><span class="tick">// CMLITE</span><span>PRODUCT</span></div></div>
+  <div class="grid-2" style="flex:1;">
+    <div>
+      <div class="eyebrow">Lightweight Changemaker</div>
+      <h3 style="margin-top:24px;">CMlite.</h3>
+      <p class="body lg" style="margin-top:32px;">
+        The stack you just watched, <strong>packaged</strong>.
+      </p>
+      <p class="body" style="margin-top:24px;">
+        For orgs that want the sovereignty <em>without</em> the maintenance burden.
+      </p>
+    </div>
+    <div>
+      <div style="border:2px solid var(--red); padding:48px; background:var(--ink-2);">
+        <div class="kicker red">THE OFFER</div>
+        <ul class="bullets" style="margin-top:24px;">
+          <li>You bring the <b>hardware</b> or we source it</li>
+          <li>We <b>wire it up &amp; teach</b></li>
+          <li>Sliding-scale for <b>non-profits &amp; labour</b></li>
+        </ul>
+        <p class="body" style="margin-top:32px;">
+          We don't price by what we think you'll pay. We price based on labor, invoiced, like a normal transaction.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="sig"><span>38 / CMlite</span><span class="red">hardware-in, sovereignty-out</span></div>
+</section>
+
+<!-- 39. CANADIAN POLITICAL DATA -->
+<section data-screen-label="39 Canadian political data">
+  <div class="chrome"><div class="row"><span class="tick">// CPD</span><span>OPEN DATA · FREE API</span></div></div>
+  <div style="display:grid; grid-template-columns: 1fr 1.1fr; gap:64px; flex:1; align-items:center;">
+    <div>
+      <div class="eyebrow">Canadian Political Data</div>
+      <h2 style="margin-top:20px; margin-bottom:28px; font-size:96px; line-height:0.95;">A free API.<br>The whole<br><em>public record.</em></h2>
+      <p class="body" style="max-width:800px; font-size:30px;">
+        The only public, full collection of <strong>Canadian Hansard</strong>, every politician's <strong>social media</strong>, and every other place they publish — in one place.
+      </p>
+      <p class="body" style="margin-top:18px; max-width:800px; font-size:30px;">
+        A <em>social-media-free</em> way to stay informed about what these people are saying and doing.
+      </p>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px 24px; margin-top:28px; max-width:780px;">
+        <div style="border-top:2px solid var(--red); padding-top:12px;"><b style="font-size:26px; color:#fff;">Hansard · all of it</b></div>
+        <div style="border-top:2px solid var(--red); padding-top:12px;"><b style="font-size:26px; color:#fff;">Politicians' socials</b></div>
+        <div style="border-top:2px solid var(--red); padding-top:12px;"><b style="font-size:26px; color:#fff;">Press &amp; releases</b></div>
+        <div style="border-top:2px solid var(--red); padding-top:12px;"><b style="font-size:26px; color:#fff;">Voting records</b></div>
+        <div style="border-top:2px solid var(--red); padding-top:12px;"><b style="font-size:26px; color:#fff;">Riding boundaries</b></div>
+        <div style="border-top:2px solid var(--red); padding-top:12px;"><b style="font-size:26px; color:#fff;">Elected officials</b></div>
+      </div>
+      <p class="body" style="margin-top:28px; font-size:30px;">
+        In <em>your</em> CRM. <em>Your</em> dashboards. <em>Your</em> systems. <strong>Free.</strong>
+      </p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:stretch;">
+      <div style="border:2px solid var(--rule); padding:14px; background:#0a0c10;">
+        <img src="assets/cpd-screenshot.png" alt="Canadian Political Data: 3.9M speeches, 28K bills, 8.7K politicians, 9 jurisdictions" style="display:block; width:100%; height:auto;">
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:12px; font-family:var(--mono); font-size:24px;">
+        <span class="dim">canadianpoliticaldata.org</span><span class="red">★ ★ ★</span>
+      </div>
+    </div>
+  </div>
+  <div class="sig"><span>39 / CPD</span><span class="red">stay informed · without the algorithm</span></div>
+</section>
+
+<!-- 40. THE BUNKER -->
+<section data-screen-label="40 The Bunker Operations">
+  <div class="chrome"><div class="row"><span class="tick">// BNKOPS</span><span>WORKER CO-OP</span></div></div>
+  <div class="grid-2" style="flex:1;">
+    <div>
+      <div class="eyebrow">The Bunker Operations</div>
+      <h3 style="margin-top:24px;">A worker<br>co-op.<br><span class="dim">Edmonton.</span></h3>
+      <p class="body lg" style="margin-top:40px;">
+        Workers, with the right tools, will build the future. <em>We just help.</em>
+      </p>
+      <p class="body" style="margin-top:24px;">
+        We build the stack. We run the stack. We document it so you can <strong>fork us</strong>.
+      </p>
+      <div class="url-plate sm" style="margin-top:40px;"><span class="scheme">https://</span>bnkops.com</div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:24px; align-items:flex-start; justify-content:center;">
+      <div class="kicker">Three principles</div>
+      <div style="font-size:96px; font-weight:700; line-height:1; color:#fff;"><em style="color:var(--red); font-style:normal;">Build.</em></div>
+      <div style="font-size:96px; font-weight:700; line-height:1; color:#fff;"><em style="color:var(--red); font-style:normal;">Teach.</em></div>
+      <div style="font-size:96px; font-weight:700; line-height:1; color:#fff;"><em style="color:var(--red); font-style:normal;">Distribute.</em></div>
+    </div>
+  </div>
+  <div class="sig"><span>40 / BNKOPS</span><span class="red">a worker co-op, on purpose</span></div>
+</section>
+
+<!-- 41. THE ASK — handshake -->
+<section data-screen-label="41 The ask">
+  <div class="chrome"><div class="row"><span class="tick">// ASK</span><span>EPIC HANDSHAKE</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div>
+      <div class="eyebrow">The ask</div>
+      <h3 style="margin-top:24px;">Your org.<br>Your members.<br>Your tools.</h3>
+      <p class="body lg" style="margin-top:32px;">
+        We'd rather build infrastructure <em>with</em> you than sell <em>to</em> you.
+      </p>
+      <div class="url-plate sm" style="margin-top:24px;">admin@thebunkerops.ca</div>
+    </div>
+    <div class="meme-frame right">
+      <img src="assets/meme-epic-handshake.png" alt="Epic handshake — BNKops + your org × sovereign infrastructure">
+      <div class="cap"><span>file: epic-handshake</span><span>★ 41</span></div>
+    </div>
+  </div>
+  <div class="sig"><span>41 / Ask</span><span class="red">build with, not sell to</span></div>
+</section>
+
+<!-- 42. NOTHING TO LOSE — bugs bunny -->
+<section data-screen-label="42 Nothing to lose">
+  <div class="chrome"><div class="row"><span class="tick">// MEME 12</span><span>OURS.</span></div></div>
+  <div class="meme-slide" style="flex:1;">
+    <div class="meme-frame">
+      <img src="assets/meme-bugs-our.png" alt="Communist Bugs Bunny — our infrastructure, our lists">
+      <div class="cap"><span>file: bugs-our</span><span>★ 42</span></div>
+    </div>
+    <div>
+      <div class="eyebrow">Nothing to lose</div>
+      <h3 style="margin-top:24px;">Nothing to lose<br>but an expensive<br>subscription<br>or two.</h3>
+      <p class="body lg" style="margin-top:32px;">
+        The strength of our neighbours is in <em>this room</em>.
+      </p>
+    </div>
+  </div>
+  <div class="sig"><span>42 / Solidarity</span><span class="red">infra · members · lists · futures · ours</span></div>
+</section>
+
+<!-- 43. THANK YOU -->
+<section data-screen-label="43 Thank you" class="dot-bg">
+  <div class="chrome"><div class="row"><span class="tick">// FIN</span><span>THANK YOU</span></div></div>
+  <div class="eyebrow">Thank you</div>
+  <h2 style="font-size:160px; margin-top:24px; margin-bottom:48px; line-height:0.9;">Take this home.</h2>
+  <div class="contacts" style="margin-bottom:80px;">
+    <div class="item">
+      <div class="qr"></div>
+      <h5>Live site</h5>
+      <p>pia2026.<br>publicinterestalberta.org</p>
+    </div>
+    <div class="item">
+      <div class="qr"></div>
+      <h5>Repo</h5>
+      <p>github.com/adminatthebunker<br>/PIA-BNKOP-SERVER</p>
+    </div>
+    <div class="item">
+      <div class="qr"></div>
+      <h5>Handout</h5>
+      <p>publicinterestalberta.org<br>/foss-resources</p>
+    </div>
+    <div class="item">
+      <div class="qr"></div>
+      <h5>Sign up · talk</h5>
+      <p>bnkops.com<br>admin@thebunkerops.ca</p>
+    </div>
+  </div>
+  <div class="sig"><span>43 / Fin</span><span class="red">— Reed Larsen · The Bunker Operations</span></div>
+</section>
+
+</deck-stage>
+
+<div id="tweaks-root"></div>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#a78bfa",
+  "ink": "#0d0e10",
+  "paper": "#f4efe4",
+  "headingFont": "Space Grotesk",
+  "monoFont": "JetBrains Mono",
+  "showChrome": true,
+  "showSig": true,
+  "showCaptions": true,
+  "memeRotation": true,
+  "showDots": true,
+  "italicAccent": true
+}/*EDITMODE-END*/;
+
+const FONT_OPTIONS = [
+  "Space Grotesk", "Archivo", "Inter Tight", "Bricolage Grotesque", "DM Sans", "Manrope", "Anton", "Helvetica"
+];
+const MONO_OPTIONS = [
+  "JetBrains Mono", "IBM Plex Mono", "Space Mono", "Fira Code", "DM Mono"
+];
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  React.useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--red', t.accent);
+    root.style.setProperty('--ink', t.ink);
+    root.style.setProperty('--paper', t.paper);
+    root.style.setProperty('--sans', `'${t.headingFont}', system-ui, sans-serif`);
+    root.style.setProperty('--mono', `'${t.monoFont}', ui-monospace, monospace`);
+
+    // Ensure heading & mono fonts are loaded from Google Fonts
+    const id = 'twk-fonts';
+    let link = document.getElementById(id);
+    const fams = [
+      `${t.headingFont.replace(/ /g,'+')}:wght@400;500;600;700`,
+      `${t.monoFont.replace(/ /g,'+')}:wght@400;500;700`
+    ];
+    const href = `https://fonts.googleapis.com/css2?${fams.map(f=>'family='+f).join('&')}&display=swap`;
+    if (!link) {
+      link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
+    }
+    link.href = href;
+  }, [t.accent, t.ink, t.paper, t.headingFont, t.monoFont]);
+
+  React.useEffect(() => {
+    document.querySelectorAll('.chrome').forEach(el => el.style.display = t.showChrome ? '' : 'none');
+  }, [t.showChrome]);
+
+  React.useEffect(() => {
+    document.querySelectorAll('.sig').forEach(el => el.style.display = t.showSig ? '' : 'none');
+  }, [t.showSig]);
+
+  React.useEffect(() => {
+    document.querySelectorAll('.meme-frame .cap').forEach(el => el.style.display = t.showCaptions ? '' : 'none');
+  }, [t.showCaptions]);
+
+  React.useEffect(() => {
+    document.querySelectorAll('.meme-frame').forEach(el => {
+      el.style.transform = t.memeRotation ? '' : 'rotate(0deg)';
+    });
+  }, [t.memeRotation]);
+
+  React.useEffect(() => {
+    document.querySelectorAll('.dot-bg').forEach(el => {
+      el.style.backgroundImage = t.showDots ? '' : 'none';
+    });
+  }, [t.showDots]);
+
+  React.useEffect(() => {
+    // toggle the red color on <em> for accent emphasis
+    let style = document.getElementById('twk-em-style');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'twk-em-style';
+      document.head.appendChild(style);
+    }
+    style.textContent = t.italicAccent
+      ? `em{ color: var(--red); font-style: normal; font-weight: 600; }`
+      : `em{ color: inherit; font-style: italic; font-weight: inherit; }`;
+  }, [t.italicAccent]);
+
+  return (
+    <TweaksPanel title="Tweaks">
+      <TweakSection label="Color" />
+      <TweakColor label="Accent" value={t.accent} onChange={(v)=>setTweak('accent', v)} />
+      <TweakColor label="Ink (bg)" value={t.ink} onChange={(v)=>setTweak('ink', v)} />
+      <TweakColor label="Paper" value={t.paper} onChange={(v)=>setTweak('paper', v)} />
+
+      <TweakSection label="Typography" />
+      <TweakSelect label="Heading font" value={t.headingFont} options={FONT_OPTIONS}
+                   onChange={(v)=>setTweak('headingFont', v)} />
+      <TweakSelect label="Mono font" value={t.monoFont} options={MONO_OPTIONS}
+                   onChange={(v)=>setTweak('monoFont', v)} />
+      <TweakToggle label="Accent on emphasis" value={t.italicAccent}
+                   onChange={(v)=>setTweak('italicAccent', v)} />
+
+      <TweakSection label="Chrome" />
+      <TweakToggle label="Top corner stamps" value={t.showChrome}
+                   onChange={(v)=>setTweak('showChrome', v)} />
+      <TweakToggle label="Bottom signature" value={t.showSig}
+                   onChange={(v)=>setTweak('showSig', v)} />
+      <TweakToggle label="Background dot grid" value={t.showDots}
+                   onChange={(v)=>setTweak('showDots', v)} />
+
+      <TweakSection label="Memes" />
+      <TweakToggle label="File-name captions" value={t.showCaptions}
+                   onChange={(v)=>setTweak('showCaptions', v)} />
+      <TweakToggle label="Rotate frames (zine feel)" value={t.memeRotation}
+                   onChange={(v)=>setTweak('memeRotation', v)} />
+    </TweaksPanel>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('tweaks-root'));
+root.render(<App/>);
+</script>
+
+</body>
+</html>
